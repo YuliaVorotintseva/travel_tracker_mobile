@@ -10,7 +10,7 @@
     "android:dev-client": "expo start --dev-client --android",
     "ios": "expo run:ios",
     "ios:dev-client": "expo start --dev-client --ios",
-    "prebuild": "expo prebuild",
+    "prebuild": "expo prebuild --clean",
     "prebuild:clean": "expo prebuild --clean",
     "web": "expo start --web",
     "lint": "yarn run lint:eslint && yarn run lint:prettier",

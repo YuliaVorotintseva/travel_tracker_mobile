@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yuliavorotintseva.travel-tracker-mobile"
+      "bundleIdentifier": "com.yuliavorotintseva.travelTrackerMobile"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.yuliavorotintseva.travel_tracker_mobile"
+      "package": "com.yuliavorotintseva.travelTrackerMobile"
     },
     "web": {
       "output": "static",
