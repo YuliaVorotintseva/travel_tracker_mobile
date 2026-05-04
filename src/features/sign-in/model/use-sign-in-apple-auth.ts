@@ -2,8 +2,10 @@ import * as AppleAuth from "expo-apple-authentication";
 import { useRouter } from "expo-router";
 
 import { supabase } from "@/src/shared/lib";
+import { useAuth } from "@/src/shared/lib/auth-context";
 
 export const useSignInAppleAuth = () => {
+  const { setToken, setIsAuthenticated } = useAuth();
   const router = useRouter();
 
   const signInWithApple = async () => {
@@ -19,7 +21,7 @@ export const useSignInAppleAuth = () => {
         throw new Error("Apple id token is not received");
       }
 
-      const { error } = await supabase.auth.signInWithIdToken({
+      const { data, error } = await supabase.auth.signInWithIdToken({
         provider: "apple",
         token: credendials.identityToken,
       });
@@ -28,6 +30,8 @@ export const useSignInAppleAuth = () => {
         throw error;
       }
 
+      setToken(data.session.access_token);
+      setIsAuthenticated(true);
       router.back();
     } catch (error: unknown) {
       if (typeof error === "object" && error !== null) {

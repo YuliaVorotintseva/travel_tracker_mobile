@@ -5,6 +5,7 @@ import { Platform } from "react-native";
 
 import { ENV } from "@/src/shared/config";
 import { supabase } from "@/src/shared/lib";
+import { useAuth } from "@/src/shared/lib/auth-context";
 
 GoogleSignin.configure({
   webClientId: ENV.WEB_CLIENT_ID,
@@ -14,8 +15,9 @@ GoogleSignin.configure({
 });
 
 export const useSignInGoogleAuth = () => {
-  const router = useRouter();
+  const { setToken, setIsAuthenticated } = useAuth();
   const isSignIn = useRef(false);
+  const router = useRouter();
 
   const signInWithGoogle = async () => {
     if (isSignIn.current) {
@@ -36,7 +38,7 @@ export const useSignInGoogleAuth = () => {
           throw new Error("Google access token is not received");
         }
 
-        const { error } = await supabase.auth.signInWithIdToken({
+        const { data, error } = await supabase.auth.signInWithIdToken({
           provider: "google",
           token: idToken,
         });
@@ -46,7 +48,9 @@ export const useSignInGoogleAuth = () => {
         }
 
         isSignIn.current = true;
-        router.back();
+        setToken(data.session.access_token);
+        setIsAuthenticated(true);
+        router.replace("/(tabs)");
       } else {
         throw new Error(
           "Google id token is not received or Google sign-in was cancelled",

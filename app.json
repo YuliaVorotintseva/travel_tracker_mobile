@@ -10,7 +10,11 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yuliavorotintseva.travelTrackerMobile"
+      "bundleIdentifier": "com.yuliavorotintseva.travelTrackerMobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Приложению нужен доступ к вашему местоположению для отображения на карте",
+        "NSLocationAlwaysUsageDescription": "Приложению нужен доступ к вашему местоположению для отображения на карте"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,6 +23,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.yuliavorotintseva.travelTrackerMobile"
@@ -39,6 +44,13 @@
           "dark": {
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "react-native-maps",
+        {
+          "iosGoogleMapsApiKey": "AIzaSyD7LizMzoxM264nyGGXSxcVPoQ-XpocnKg",
+          "androidGoogleMapsApiKey": "AIzaSyAQGw0EvRRKKOWEnPdTy4faNMDYH0nAMbo"
         }
       ]
     ],

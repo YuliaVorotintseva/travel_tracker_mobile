@@ -1,28 +1,39 @@
-import { Pressable, Text, View } from "react-native";
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
-import {
-  useSignInAppleAuth,
-  useSignInGoogleAuth,
-} from "@/src/features/sign-in/model";
-
-export default function HomeScreen() {
-  const { signInWithGoogle } = useSignInGoogleAuth();
-  const { signInWithApple } = useSignInAppleAuth();
+const MyMap = () => {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 50,
-      }}
-    >
-      <Pressable onPress={signInWithGoogle}>
-        <Text>Google</Text>
-      </Pressable>
-      <Pressable onPress={signInWithApple}>
-        <Text>Apple</Text>
-      </Pressable>
+    <View style={styles.container}>
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: 37.78825,
+          longitude: -122.4324,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      >
+        <Marker
+          coordinate={{
+            latitude: 37.78825,
+            longitude: -122.4324,
+          }}
+          title="My Marker"
+          description="This is a marker"
+        />
+      </MapView>
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+});
+
+export default MyMap;

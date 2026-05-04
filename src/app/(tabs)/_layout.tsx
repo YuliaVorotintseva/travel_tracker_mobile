@@ -1,18 +1,23 @@
-import { Tabs } from "expo-router";
-import React from "react";
+import { Tabs, useRouter } from "expo-router";
+import React, { useEffect } from "react";
 
-import { Colors } from "@/src/shared/constants/theme";
-import { useColorScheme } from "@/src/shared/hooks/use-color-scheme";
+import { useAuth } from "@/src/shared/lib/auth-context";
 import { HapticTab } from "@/src/shared/ui/haptic-tab";
 import { IconSymbol } from "@/src/shared/ui/icon-symbol";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.replace("/");
+    }
+  }, []);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         tabBarButton: HapticTab,
       }}
