@@ -14,7 +14,8 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Приложению нужен доступ к вашему местоположению для отображения на карте",
         "NSLocationAlwaysUsageDescription": "Приложению нужен доступ к вашему местоположению для отображения на карте"
-      }
+      },
+      "appleTeamId": "9TRN25LLSZ"
     },
     "android": {
       "adaptiveIcon": {
