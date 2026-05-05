@@ -1,0 +1,67 @@
+import { Dimensions, StyleSheet } from "react-native";
+
+const { height } = Dimensions.get("window");
+export const styles = StyleSheet.create({
+  trigger: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 12,
+    padding: 14,
+    backgroundColor: "#F8FAFC",
+  },
+  triggerDisabled: { opacity: 0.5, backgroundColor: "#E2E8F0" },
+  triggerText: { fontSize: 16, color: "#0F172A" },
+  placeholder: { color: "#94A3B8" },
+  arrow: { fontSize: 12, color: "#64748B" },
+  overlay: { flex: 1, justifyContent: "flex-end" },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  sheet: {
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: height * 0.65,
+    paddingBottom: 20,
+  },
+  sheetTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  searchInput: {
+    margin: 12,
+    padding: 12,
+    backgroundColor: "#F1F5F9",
+    borderRadius: 10,
+    fontSize: 16,
+  },
+  list: { maxHeight: height * 0.45 },
+  optionItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F8FAFC",
+  },
+  optionItemSelected: { backgroundColor: "#EFF6FF" },
+  optionContent: { flexDirection: "row", alignItems: "center", gap: 10 },
+  optionIcon: { fontSize: 18 },
+  optionText: { fontSize: 16, color: "#334155" },
+  optionTextSelected: { color: "#2563EB", fontWeight: "600" },
+  checkmark: { fontSize: 20, color: "#2563EB", fontWeight: "bold" },
+  emptyText: {
+    textAlign: "center",
+    padding: 24,
+    color: "#94A3B8",
+    fontSize: 16,
+  },
+});

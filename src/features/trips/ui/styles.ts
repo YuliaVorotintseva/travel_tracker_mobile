@@ -1,0 +1,76 @@
+import { Dimensions, StyleSheet } from "react-native";
+
+import { Styles } from "@/src/shared/styles";
+import { Theme } from "@/src/shared/types";
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get("screen");
+
+export const getStyles = (theme: Theme) =>
+  StyleSheet.create({
+    wrapper: {
+      flex: 1,
+      paddingHorizontal: 16,
+      backgroundColor: Styles[theme].BgPrimary,
+      height: screenHeight,
+    },
+    header: {
+      justifyContent: "center",
+      alignItems: "center",
+      paddingVertical: 20,
+    },
+    content: {
+      paddingTop: 28,
+    },
+    uploadImgArea: {
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: Styles[theme].BgSecondary,
+      borderColor: Styles[theme].BorderDefault,
+      borderStyle: "dashed",
+      borderRadius: 24,
+      borderWidth: 2,
+      width: (screenWidth / 100) * 92,
+      height: 166,
+      marginBottom: 24,
+    },
+    previewImage: {
+      width: (screenWidth / 100) * 92,
+      height: 166,
+      borderRadius: 24,
+    },
+    uploadIcon: {
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    label: {
+      color: Styles[theme].TextSecondary,
+      fontWeight: "600",
+      fontSize: 14,
+    },
+    inputs: {
+      justifyContent: "space-between",
+      gap: 20,
+      marginBottom: 52,
+    },
+    input: {
+      borderBottomColor: Styles[theme].BorderDisabled,
+      borderBottomWidth: 2,
+      backgroundColor: Styles[theme].BgPrimary,
+      color: Styles[theme].TextPrimary,
+      paddingTop: 12,
+      paddingBottom: 16,
+      fontWeight: "400",
+      fontSize: 16,
+      width: "100%",
+    },
+    publishBtn: {
+      width: (screenWidth / 100) * 92,
+      height: 56,
+      borderRadius: 20,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    error: {
+      color: Styles[theme].TextNegative,
+    },
+  });

@@ -1,4 +1,6 @@
 export * from "./apple-icon";
+export * from "./back-icon";
+export * from "./close-icon";
 export * from "./dark-theme-icon";
 export * from "./google-icon";
 export * from "./hide-password-icon";
