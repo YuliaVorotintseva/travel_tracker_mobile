@@ -12,7 +12,7 @@ export type SignInParams = {
 export const useLogin = () => {
   const router = useRouter();
   const [customError, setCustomError] = useState<string | null>(null);
-  const { setToken, setIsAuthenticated, loading } = useAuth();
+  const { setIsAuthenticated, loading } = useAuth();
 
   const login = async (input: SignInParams) => {
     try {
@@ -25,8 +25,7 @@ export const useLogin = () => {
         throw error;
       }
 
-      if (!!data.user && !!data.session?.access_token) {
-        setToken(data.session.access_token);
+      if (!!data.user && !!data.session.access_token) {
         setIsAuthenticated(true);
         router.replace("/(tabs)");
       }

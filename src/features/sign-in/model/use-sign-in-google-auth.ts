@@ -15,7 +15,7 @@ GoogleSignin.configure({
 });
 
 export const useSignInGoogleAuth = () => {
-  const { setToken, setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated } = useAuth();
   const isSignIn = useRef(false);
   const router = useRouter();
 
@@ -38,7 +38,7 @@ export const useSignInGoogleAuth = () => {
           throw new Error("Google access token is not received");
         }
 
-        const { data, error } = await supabase.auth.signInWithIdToken({
+        const { error } = await supabase.auth.signInWithIdToken({
           provider: "google",
           token: idToken,
         });
@@ -48,7 +48,6 @@ export const useSignInGoogleAuth = () => {
         }
 
         isSignIn.current = true;
-        setToken(data.session.access_token);
         setIsAuthenticated(true);
         router.replace("/(tabs)");
       } else {

@@ -13,7 +13,7 @@ export type SignUpParams = {
 
 export const useLogup = () => {
   const [customError, setCustomError] = useState<string | null>(null);
-  const { setToken, setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated } = useAuth();
   const router = useRouter();
 
   const logup = async (input: SignUpParams) => {
@@ -34,8 +34,7 @@ export const useLogup = () => {
         throw error;
       }
 
-      if (!!data.user && !!data.session?.access_token) {
-        setToken(data.session.access_token);
+      if (!!data.user && !!data.session) {
         setIsAuthenticated(true);
         router.replace("/(tabs)");
       }

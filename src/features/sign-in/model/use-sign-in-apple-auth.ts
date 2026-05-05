@@ -5,7 +5,7 @@ import { supabase } from "@/src/shared/lib";
 import { useAuth } from "@/src/shared/lib/auth-context";
 
 export const useSignInAppleAuth = () => {
-  const { setToken, setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated } = useAuth();
   const router = useRouter();
 
   const signInWithApple = async () => {
@@ -30,7 +30,6 @@ export const useSignInAppleAuth = () => {
         throw error;
       }
 
-      setToken(data.session.access_token);
       setIsAuthenticated(true);
       router.back();
     } catch (error: unknown) {

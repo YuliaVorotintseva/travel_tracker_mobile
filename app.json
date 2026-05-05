@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "travel_tracker_mobile",
-    "slug": "travel_tracker_mobile",
+    "name": "travelTrackerMobile",
+    "slug": "travelTrackerMobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "traveltrackermobile",
+    "scheme": "traveltracker",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

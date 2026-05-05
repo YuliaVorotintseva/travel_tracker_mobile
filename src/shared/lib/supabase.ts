@@ -5,8 +5,7 @@ import { AppState } from "react-native";
 import { ENV } from "../config/env";
 
 type AuthResponse = {
-  access_token: string;
-  refresh_token: string;
+  [key: string]: string;
 };
 
 const secureStorage = {
@@ -21,15 +20,7 @@ const secureStorage = {
 
   setItem: async (key: string, value: string): Promise<void> => {
     try {
-      const parsed = JSON.parse(value) as AuthResponse;
-
-      const accessToken = parsed.access_token || value;
-      const accessKey = parsed.access_token ? "access_token" : key;
-      await SecureStore.setItemAsync(accessKey, accessToken);
-
-      const refreshToken = parsed.refresh_token || value;
-      const refreshKey = parsed.refresh_token ? "refresh_token" : key;
-      await SecureStore.setItemAsync(refreshKey, refreshToken);
+      await SecureStore.setItem(key, value);
     } catch (error: unknown) {
       console.error("Error setting item: ", error);
       throw error;
