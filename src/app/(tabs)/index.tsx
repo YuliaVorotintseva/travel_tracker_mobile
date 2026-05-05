@@ -1,8 +1,10 @@
+import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
 const MyMap = () => {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <MapView
@@ -23,6 +25,20 @@ const MyMap = () => {
           description="This is a marker"
         />
       </MapView>
+
+      <Pressable
+        style={{
+          top: 100,
+          left: 50,
+          padding: 10,
+          borderRadius: 8,
+          backgroundColor: "white",
+          alignSelf: "flex-start",
+        }}
+        onPress={() => router.push("/settings")}
+      >
+        <Text style={{ fontWeight: "600" }}>SETTINGS</Text>
+      </Pressable>
     </View>
   );
 };

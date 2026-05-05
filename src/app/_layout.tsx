@@ -11,9 +11,15 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="sign-up" />
-          <Stack.Screen name="map" />
 
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="settings"
+            options={{
+              presentation: "transparentModal",
+              animation: "fade",
+            }}
+          />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

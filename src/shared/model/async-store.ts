@@ -28,8 +28,9 @@ export const useSessionStore = create<SessionState & SessionActions>()(
       name: "session",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
-        theme: state,
+        theme: state.theme,
       }),
+      version: 1,
     },
   ),
 );
