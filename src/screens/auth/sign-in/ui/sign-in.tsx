@@ -58,9 +58,6 @@ export const SignInScreen: FC = () => {
         <View style={styles.content}>
           <View>
             <Text style={styles.title}>Log in</Text>
-            <Text style={styles.text}>
-              You will be able to fully communicate
-            </Text>
           </View>
           <View style={styles.formInputs}>
             <Controller

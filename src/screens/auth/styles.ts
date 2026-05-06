@@ -19,6 +19,7 @@ export const getStyles = (theme: Theme) =>
       gap: 40,
     },
     providersConteiner: {
+      flexDirection: "row",
       justifyContent: "center",
       gap: 50,
     },
@@ -53,10 +54,10 @@ export const getStyles = (theme: Theme) =>
       width: "100%",
     },
     formBtns: {
-      position: "absolute",
       bottom: 0,
       justifyContent: "space-around",
       alignItems: "center",
+      alignSelf: "center",
       gap: 20,
       width: screenWidth,
     },

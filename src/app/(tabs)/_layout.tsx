@@ -1,15 +1,13 @@
 import { Tabs, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 
-import { useTheme } from "@/src/shared/lib";
+import { TravelIcon } from "@/src/shared/icons";
+import { HomeLocationIcon } from "@/src/shared/icons/home-location-icon";
 import { useAuth } from "@/src/shared/lib/auth-context";
-import { Styles } from "@/src/shared/styles";
 import { HapticTab } from "@/src/shared/ui/haptic-tab";
-import { IconSymbol } from "@/src/shared/ui/icon-symbol";
 
 export default function TabLayout() {
   const { isAuthenticated } = useAuth();
-  const { theme } = useTheme();
   const router = useRouter();
 
   useEffect(() => {
@@ -29,13 +27,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: () => (
-            <IconSymbol
-              size={28}
-              name="house.fill"
-              color={Styles[theme].IconAccent}
-            />
-          ),
+          tabBarIcon: () => <HomeLocationIcon />,
+        }}
+      />
+      <Tabs.Screen
+        name="my-trips"
+        options={{
+          title: "My trips",
+          tabBarIcon: () => <TravelIcon />,
         }}
       />
     </Tabs>

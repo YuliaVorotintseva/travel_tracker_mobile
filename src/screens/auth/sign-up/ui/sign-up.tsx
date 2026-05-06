@@ -50,7 +50,6 @@ export const SignUpScreen: FC = () => {
         <View style={styles.content}>
           <View>
             <Text style={styles.title}>Join us</Text>
-            <Text>You will be able to fully communicate</Text>
           </View>
           <View style={styles.formInputs}>
             <Controller

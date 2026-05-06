@@ -11,16 +11,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { BackIcon, CloseIcon } from "@/src/shared/icons";
+import { BackIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
-import { Currency } from "@/src/shared/types";
-import {
-  DatePickerModal,
-  IconBackButton,
-  SelectOption,
-  SelectPicker,
-} from "../../../shared/ui";
+import { CURRENCIES, Currency } from "@/src/shared/types";
+import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
+import { getFormatDate } from "@/src/shared/utils";
 import { getStyles } from "./styles";
 
 type CreateTripData = {
@@ -32,33 +28,13 @@ type CreateTripData = {
   currency: Currency;
 };
 
-const formatDate = (date = new Date()) => {
-  return date
-    .toLocaleString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    })
-    .replace(" at ", ", at ");
-};
-
-const CURRENCIES: SelectOption<Currency>[] = [
-  { label: "USD 🇺🇸", value: "USD" },
-  { label: "EUR 🇪🇺", value: "EUR" },
-  { label: "RUB 🇷🇺", value: "RUB" },
-  { label: "GBP 🇬🇧", value: "GBP" },
-];
-
-export const CreatePost: FC = () => {
+export const CreateTrip: FC = () => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [isStartCalendarFisible, setIsStartCalendarFisible] = useState(false);
-  const [isFinishCalendarFisible, setIsFinishCalendarFisible] = useState(false);
+  const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
+  const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [currency, setCurrency] = useState<Currency>("USD");
@@ -72,8 +48,8 @@ export const CreatePost: FC = () => {
       title: "",
       description: "",
       destination: "",
-      start_date: Date.now().toString(),
-      end_date: Date.now().toString(),
+      start_date: new Date().toISOString(),
+      end_date: new Date().toISOString(),
       currency: "USD",
     },
     mode: "onBlur",
@@ -95,18 +71,22 @@ export const CreatePost: FC = () => {
       if (!userId) {
         return;
       }
+      console.log(input);
 
       const newTripData = {
         ...input,
+        start_date: startDate,
+        end_date: endDate,
+        currency,
         created_by: userId,
       };
 
       const { data, error } = await supabase
         .from("trips")
-        .insert([newTripData])
+        .insert(newTripData)
         .select()
         .single();
-      console.log(data);
+      console.log("NEW TRIP: ", data);
 
       if (!!error) {
         console.error((error as { message: string }).message);
@@ -126,7 +106,6 @@ export const CreatePost: FC = () => {
           <View style={styles.header}>
             <IconBackButton icon={<BackIcon />} />
             <Text>Create trip</Text>
-            <IconBackButton icon={<CloseIcon />} />
           </View>
           <View style={styles.content}>
             <View style={styles.inputs}>
@@ -206,29 +185,28 @@ export const CreatePost: FC = () => {
               <Controller
                 name="start_date"
                 control={control}
-                render={({ field: { value } }) => (
+                render={() => (
                   <View>
-                    <Text>Start trip date</Text>
                     <DatePickerModal
-                      visible={isStartCalendarFisible}
-                      onClose={() => setIsStartCalendarFisible(false)}
+                      visible={isStartCalendarVisible}
+                      onClose={() => setIsStartCalendarVisible(false)}
                       onSelect={(date) => {
-                        setStartDate(date.toString());
+                        setStartDate(new Date(date).toISOString());
                         if (!endDate) {
                           const next = new Date(date);
                           next.setDate(next.getDate() + 1);
-                          setEndDate(next.toISOString().split("T")[0]);
+                          setEndDate(next.toISOString());
                         }
                       }}
                       minDate={new Date()}
                     />
 
-                    <Pressable onPress={() => setIsStartCalendarFisible(true)}>
+                    <Pressable onPress={() => setIsStartCalendarVisible(true)}>
                       <Text style={styles.label}>Start day</Text>
                       <TextInput
                         placeholder="Enter start day"
                         placeholderTextColor={Styles[theme].TextSecondary}
-                        value={value}
+                        value={getFormatDate(new Date(startDate!))}
                         autoCapitalize="none"
                         style={styles.input}
                         editable={false}
@@ -240,22 +218,23 @@ export const CreatePost: FC = () => {
               <Controller
                 name="end_date"
                 control={control}
-                render={({ field: { value } }) => (
+                render={() => (
                   <View>
-                    <Text>Finish trip date</Text>
                     <DatePickerModal
-                      visible={isFinishCalendarFisible}
-                      onClose={() => setIsFinishCalendarFisible(false)}
-                      onSelect={setEndDate}
+                      visible={isFinishCalendarVisible}
+                      onClose={() => setIsFinishCalendarVisible(false)}
+                      onSelect={(date) =>
+                        setEndDate(new Date(date).toISOString())
+                      }
                       minDate={startDate ? new Date(startDate) : new Date()}
                     />
 
-                    <Pressable onPress={() => setIsStartCalendarFisible(true)}>
+                    <Pressable onPress={() => setIsFinishCalendarVisible(true)}>
                       <Text style={styles.label}>Finish day</Text>
                       <TextInput
                         placeholder="Enter start day"
                         placeholderTextColor={Styles[theme].TextSecondary}
-                        value={value}
+                        value={getFormatDate(new Date(endDate!))}
                         autoCapitalize="none"
                         style={styles.input}
                         editable={false}
@@ -267,11 +246,11 @@ export const CreatePost: FC = () => {
               <Controller
                 name="currency"
                 control={control}
-                render={({ field: { value } }) => (
+                render={() => (
                   <View>
-                    <Text>Choose currency</Text>
+                    <Text style={styles.label}>Choose currency</Text>
                     <SelectPicker
-                      value={value}
+                      value={currency}
                       onChange={setCurrency}
                       options={CURRENCIES}
                       searchable={false}
@@ -302,7 +281,7 @@ export const CreatePost: FC = () => {
                       : Styles[theme].TextDisabled,
                 }}
               >
-                Publish
+                Create
               </Text>
             </Pressable>
           </View>
