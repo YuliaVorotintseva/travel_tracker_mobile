@@ -2,18 +2,17 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   content: {
-    backgroundColor: "#C2534C",
     zIndex: -1,
     width: 120,
-    height: 357,
+    height: 350,
     justifyContent: "center",
-    alignItems: "flex-end",
+    alignItems: "center",
     paddingRight: 20,
   },
   text: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#FFFFFF",
+    color: "#C2534C",
     marginTop: 4,
   },
 });

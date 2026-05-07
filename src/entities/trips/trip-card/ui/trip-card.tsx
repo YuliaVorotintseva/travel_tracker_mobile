@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, View } from "react-native";
 
 import { ShareIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
@@ -8,12 +8,7 @@ import { getFormatDate } from "@/src/shared/utils";
 import { User } from "@supabase/supabase-js";
 import { getStyles } from "./styles";
 
-type TripCardProps = {
-  post: TripWithMembers;
-  onPress: () => void;
-};
-
-export const TripCard: FC<TripCardProps> = ({ post, onPress }) => {
+export const TripCard: FC<{ trip: TripWithMembers }> = ({ trip }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [author, setAuthor] = useState<User | null>(null);
@@ -30,12 +25,18 @@ export const TripCard: FC<TripCardProps> = ({ post, onPress }) => {
   }, []);
 
   return (
-    <TouchableOpacity onPress={onPress} style={styles.content}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.text}>{post.title}</Text>
+        <Text style={styles.text}>{trip.title}</Text>
         <Text style={styles.text}>
-          {getFormatDate(new Date(post.created_at!))}
+          {getFormatDate(new Date(trip.created_at!))}
         </Text>
+      </View>
+      <View style={styles.content}>
+        {
+          // activities
+          // members
+        }
       </View>
       <View style={styles.footer}>
         <View style={styles.userInfo}>
@@ -51,6 +52,6 @@ export const TripCard: FC<TripCardProps> = ({ post, onPress }) => {
           <ShareIcon />
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };

@@ -8,6 +8,7 @@ import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { CURRENCIES, Currency, Trip } from "@/src/shared/types";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
+import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
 
 export type EditTripFormData = {
@@ -22,10 +23,11 @@ export type EditTripFormData = {
 export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  const router = useRouter();
   const [trip, setTrip] = useState<Trip | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isStartCalendarFisible, setIsStartCalendarFisible] = useState(false);
-  const [isFinishCalendarFisible, setIsFinishCalendarFisible] = useState(false);
+  const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
+  const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
 
   const {
     control,
@@ -94,6 +96,8 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
       }
 
       setTrip(updatedTrip);
+      console.log("Trip was successful updated!");
+      router.back();
     } catch (error: unknown) {
       setError((error as { message: string }).message);
       console.error(JSON.stringify(error, null, 2));
@@ -142,7 +146,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                 <View>
                   <Text style={styles.label}>Description</Text>
                   <TextInput
-                    placeholder="Enter your post"
+                    placeholder="Enter description of the trip"
                     placeholderTextColor={Styles[theme].TextSecondary}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -164,7 +168,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                 <View>
                   <Text style={styles.label}>Destination</Text>
                   <TextInput
-                    placeholder="Enter your post"
+                    placeholder="Enter your destination"
                     placeholderTextColor={Styles[theme].TextSecondary}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -182,13 +186,13 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
               render={({ field: { onChange, value } }) => (
                 <View>
                   <DatePickerModal
-                    visible={isStartCalendarFisible}
-                    onClose={() => setIsStartCalendarFisible(false)}
+                    visible={isStartCalendarVisible}
+                    onClose={() => setIsStartCalendarVisible(false)}
                     onSelect={onChange}
                     minDate={new Date()}
                   />
 
-                  <Pressable onPress={() => setIsStartCalendarFisible(true)}>
+                  <Pressable onPress={() => setIsStartCalendarVisible(true)}>
                     <Text style={styles.label}>Start day</Text>
                     <TextInput
                       placeholder="Enter start day"
@@ -209,12 +213,12 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
               render={({ field: { onChange, value } }) => (
                 <View>
                   <DatePickerModal
-                    visible={isFinishCalendarFisible}
-                    onClose={() => setIsFinishCalendarFisible(false)}
+                    visible={isFinishCalendarVisible}
+                    onClose={() => setIsFinishCalendarVisible(false)}
                     onSelect={onChange}
                   />
 
-                  <Pressable onPress={() => setIsStartCalendarFisible(true)}>
+                  <Pressable onPress={() => setIsFinishCalendarVisible(true)}>
                     <Text style={styles.label}>Finish day</Text>
                     <TextInput
                       placeholder="Enter start day"

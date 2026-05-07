@@ -3,12 +3,17 @@ import React, { useEffect } from "react";
 
 import { TravelIcon } from "@/src/shared/icons";
 import { HomeLocationIcon } from "@/src/shared/icons/home-location-icon";
+import { useTheme } from "@/src/shared/lib";
 import { useAuth } from "@/src/shared/lib/auth-context";
+import { Styles } from "@/src/shared/styles";
 import { HapticTab } from "@/src/shared/ui/haptic-tab";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const { isAuthenticated } = useAuth();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -21,6 +26,9 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: {
+          backgroundColor: Styles[theme].BgPrimary,
+        },
       }}
     >
       <Tabs.Screen

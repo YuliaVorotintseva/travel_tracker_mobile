@@ -11,3 +11,4 @@ export * from "./share-icon";
 export * from "./show-password-icon";
 export * from "./trash-icon";
 export * from "./travel-icon";
+export * from "./user-icon";

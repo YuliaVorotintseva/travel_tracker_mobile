@@ -60,14 +60,14 @@ export const Settings: FC = () => {
         <View style={styles.profileSettings}>
           {!loading && (
             <View style={styles.userInfo}>
-              <View>
+              <Pressable onPress={() => router.push("/users/my_profile")}>
                 {user?.user_metadata["avatar_url"] && (
                   <Image
                     source={{ uri: user.user_metadata["avatar_url"] }}
                     style={styles.avatar}
                   />
                 )}
-              </View>
+              </Pressable>
               <View>
                 <Text style={styles.optionText}>
                   {user?.user_metadata["full_name"]

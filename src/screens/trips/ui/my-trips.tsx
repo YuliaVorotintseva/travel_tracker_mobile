@@ -7,6 +7,7 @@ import { MyTripCard } from "@/src/entities/trips/my-trip-card/ui";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { TripWithMembers } from "@/src/shared/types";
 import { CreateButton } from "@/src/shared/ui";
+import { Loader } from "@/src/shared/ui/loaders";
 import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
 
@@ -16,6 +17,7 @@ export const MyTripsScreen: FC = () => {
   const styles = getStyles(theme);
   const [myTrips, setMyTrips] = useState<TripWithMembers[] | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth
@@ -29,9 +31,10 @@ export const MyTripsScreen: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!userId) {
-      return;
-    }
+    if (!userId) return;
+
+    let isMounted = true;
+    const channel = supabase.channel(`trips-sync-${userId}`);
 
     const fetchTrips = async () => {
       try {
@@ -39,20 +42,23 @@ export const MyTripsScreen: FC = () => {
           supabase
             .from("trips")
             .select(
-              `id, title, start_date, end_date, destination, currency, created_by, trip_members(user_id, role)`,
+              "id, title, start_date, end_date, destination, currency, created_by, trip_members(user_id, role)",
             )
             .eq("created_by", userId),
-
           supabase
             .from("trips")
             .select(
-              `id, title, start_date, end_date, destination, currency, created_by, trip_members(user_id, role)`,
+              "id, title, start_date, end_date, destination, currency, created_by, trip_members(user_id, role)",
             )
             .eq("trip_members.user_id", userId),
         ]);
 
-        if (!!tripsAsCreator.error || !!tripsAsMember.error) {
-          throw tripsAsCreator.error ?? tripsAsMember.error;
+        if (!isMounted) return;
+
+        const error = tripsAsCreator.error || tripsAsMember.error;
+        if (error) {
+          console.error("Supabase fetch error:", error);
+          return;
         }
 
         const uniqueTrips = Array.from(
@@ -64,33 +70,35 @@ export const MyTripsScreen: FC = () => {
           ).values(),
         );
 
-        setMyTrips(uniqueTrips as TripWithMembers[]);
-      } catch (error: unknown) {
-        console.error(error);
+        setMyTrips(uniqueTrips);
+      } catch (err) {
+        console.error("Unexpected error:", err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchTrips();
 
-    const channel = supabase
-      .channel("trips-sync")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "trips" },
-        fetchTrips,
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "trip_members" },
-        fetchTrips,
-      )
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") {
-          console.log("✅ Realtime подключен");
-        }
+    const tables = ["trips", "trip_members"] as const;
+    const events = ["INSERT", "UPDATE", "DELETE"] as const;
+
+    tables.forEach((table) => {
+      events.forEach((event) => {
+        channel.on(
+          "postgres_changes",
+          { event, schema: "public", table },
+          fetchTrips,
+        );
       });
+    });
+
+    channel.subscribe((status) => {
+      if (status === "SUBSCRIBED") console.log("✅ Realtime подключён");
+    });
 
     return () => {
+      isMounted = false;
       channel.unsubscribe();
     };
   }, [userId]);
@@ -101,7 +109,16 @@ export const MyTripsScreen: FC = () => {
     if (!!error) {
       console.error(error);
     }
+    console.log("Trip was successfully deleted!");
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <Loader />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.wrapper}>

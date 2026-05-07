@@ -7,7 +7,7 @@ const { width: screenWidth } = Dimensions.get("screen");
 
 export const getStyles = (theme: Theme) =>
   StyleSheet.create({
-    content: {
+    container: {
       backgroundColor: Styles[theme].BgSecondary,
       paddingHorizontal: 20,
       paddingTop: 24,
@@ -19,6 +19,7 @@ export const getStyles = (theme: Theme) =>
       flexDirection: "row",
       justifyContent: "space-between",
     },
+    content: {},
     img: {
       marginTop: 12,
       marginBottom: 20,

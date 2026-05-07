@@ -7,8 +7,8 @@ export const getStyles = (theme: Theme) =>
   StyleSheet.create({
     content: {
       position: "absolute",
-      right: 16,
-      bottom: 32,
+      right: 50,
+      bottom: 0,
       height: 56,
       width: 56,
       borderRadius: 32,

@@ -1,3 +1,4 @@
+import { Loader } from "@/src/shared/ui/loaders";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -15,7 +16,7 @@ export const MapScreen = () => {
   if (loading) {
     return (
       <View style={styles.loading}>
-        <Text>LOADING...</Text>
+        <Loader />
       </View>
     );
   }

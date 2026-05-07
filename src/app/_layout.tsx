@@ -36,6 +36,13 @@ export default function RootLayout() {
                 animation: "slide_from_bottom",
               }}
             />
+            <Stack.Screen
+              name="/users/my_profile"
+              options={{
+                presentation: "transparentModal",
+                animation: "slide_from_bottom",
+              }}
+            />
           </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>

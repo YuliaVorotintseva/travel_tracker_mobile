@@ -13,7 +13,9 @@
       "bundleIdentifier": "com.yuliavorotintseva.travelTrackerMobile",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Приложению нужен доступ к вашему местоположению для отображения на карте",
-        "NSLocationAlwaysUsageDescription": "Приложению нужен доступ к вашему местоположению для отображения на карте"
+        "NSLocationAlwaysUsageDescription": "Приложению нужен доступ к вашему местоположению для отображения на карте",
+        "NSCameraUsageDescription": "Приложению нужен доступ к камере для загрузки аватара.",
+        "NSPhotoLibraryUsageDescription": "Приложению нужен доступ к галерее для загрузки аватара."
       },
       "appleTeamId": "9TRN25LLSZ"
     },
@@ -24,7 +26,13 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.yuliavorotintseva.travelTrackerMobile"

@@ -17,6 +17,7 @@ import { Styles } from "@/src/shared/styles";
 import { CURRENCIES, Currency } from "@/src/shared/types";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
 import { getFormatDate } from "@/src/shared/utils";
+import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
 
 type CreateTripData = {
@@ -31,6 +32,7 @@ type CreateTripData = {
 export const CreateTrip: FC = () => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
@@ -39,7 +41,6 @@ export const CreateTrip: FC = () => {
   const [endDate, setEndDate] = useState<string | null>(null);
   const [currency, setCurrency] = useState<Currency>("USD");
   const {
-    reset,
     control,
     handleSubmit,
     formState: { isDirty, isSubmitting },
@@ -92,7 +93,7 @@ export const CreateTrip: FC = () => {
         console.error((error as { message: string }).message);
       }
 
-      reset();
+      router.back();
     } catch (error: unknown) {
       setError((error as { message: string }).message);
       console.error(JSON.stringify(error, null, 2));
@@ -142,9 +143,9 @@ export const CreateTrip: FC = () => {
                   fieldState: { error },
                 }) => (
                   <View>
-                    <Text style={styles.label}>Post</Text>
+                    <Text style={styles.label}>Description</Text>
                     <TextInput
-                      placeholder="Enter your post"
+                      placeholder="Enter description of the trip"
                       placeholderTextColor={Styles[theme].TextSecondary}
                       onBlur={onBlur}
                       onChangeText={onChange}
@@ -166,9 +167,9 @@ export const CreateTrip: FC = () => {
                   fieldState: { error },
                 }) => (
                   <View>
-                    <Text style={styles.label}>Post</Text>
+                    <Text style={styles.label}>Destination</Text>
                     <TextInput
-                      placeholder="Enter your post"
+                      placeholder="Enter your destination"
                       placeholderTextColor={Styles[theme].TextSecondary}
                       onBlur={onBlur}
                       onChangeText={onChange}

@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 
 import { TripWithMembers } from "@/src/shared/types";
@@ -20,14 +20,13 @@ export const MyTripCard: FC<MyTripCardProps> = ({
   <Swipeable
     renderRightActions={() => (
       <View style={{ width: 80 }}>
-        <View style={{ transform: [{ translateX: -40 }] }}>
-          <DeleteButton onPress={onDelete} />
-        </View>
+        <DeleteButton onPress={onDelete} />
       </View>
     )}
     overshootRight={false}
-    rightThreshold={40}
   >
-    <TripCard post={trip} onPress={onPress} />
+    <Pressable onPress={onPress}>
+      <TripCard trip={trip} />
+    </Pressable>
   </Swipeable>
 );

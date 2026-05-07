@@ -14,4 +14,9 @@ export const getStyles = (theme: Theme) =>
       justifyContent: "center",
       alignItems: "center",
     },
+    loader: {
+      flexGrow: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
   });
