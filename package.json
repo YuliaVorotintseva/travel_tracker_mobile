@@ -19,6 +19,9 @@
     "lint:fix": "yarn run lint:eslint:fix && yarn run lint:prettier:fix",
     "lint:eslint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "lint:prettier:fix": "prettier --write .",
+    "openapi": "yarn openapi:download && yarn openapi:generate",
+    "openapi:download": "node ./scripts/download_openapi.js ./src/shared/types/api/openapi.json",
+    "openapi:generate": "npx @openapitools/openapi-generator-cli@latest generate -i ./src/shared/types/api/openapi.json -g typescript-axios --skip-validate-spec --enable-post-process-file -o ./src/shared/types/api/generated",
     "type-check": "tsc --noEmit",
     "prepare": "husky"
   },
@@ -78,6 +81,7 @@
     "eslint-plugin-react": "^7.37.5",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
+    "openapi-generator-cli": "^1.0.0",
     "prettier": "^3.8.3",
     "typescript": "~5.9.2"
   },
