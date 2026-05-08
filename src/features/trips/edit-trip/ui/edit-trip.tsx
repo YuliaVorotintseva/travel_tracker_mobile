@@ -6,7 +6,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BackIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
-import { CURRENCIES, Currency, Trip } from "@/src/shared/types";
+import { CURRENCIES, Currency } from "@/src/shared/types";
+import { Trips } from "@/src/shared/types/api/generated";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
 import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
@@ -24,7 +25,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const router = useRouter();
-  const [trip, setTrip] = useState<Trip | null>(null);
+  const [trip, setTrip] = useState<Trips | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
   const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
@@ -72,7 +73,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
         destination: trip.destination,
         start_date: trip.start_date,
         end_date: trip.end_date,
-        currency: trip.currency,
+        currency: trip.currency as Currency,
       });
     }
   }, [trip, reset]);

@@ -2,7 +2,12 @@ import { useRouter } from "expo-router";
 import { FC, useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 
-import { DarkThemeIcon, LightThemeIcon, LogOutIcon } from "@/src/shared/icons";
+import {
+  DarkThemeIcon,
+  LightThemeIcon,
+  LogOutIcon,
+  UserIcon,
+} from "@/src/shared/icons";
 import { supabase, useAuth, useTheme } from "@/src/shared/lib";
 import { User } from "@supabase/supabase-js";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -61,11 +66,13 @@ export const Settings: FC = () => {
           {!loading && (
             <View style={styles.userInfo}>
               <Pressable onPress={() => router.push("/users/my_profile")}>
-                {user?.user_metadata["avatar_url"] && (
+                {!!user?.user_metadata["avatar_url"] ? (
                   <Image
                     source={{ uri: user.user_metadata["avatar_url"] }}
                     style={styles.avatar}
                   />
+                ) : (
+                  <UserIcon width={80} theme={theme} />
                 )}
               </Pressable>
               <View>

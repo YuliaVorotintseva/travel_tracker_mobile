@@ -17,6 +17,11 @@
         "NSCameraUsageDescription": "Приложению нужен доступ к камере для загрузки аватара.",
         "NSPhotoLibraryUsageDescription": "Приложению нужен доступ к галерее для загрузки аватара."
       },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyD7LizMzoxM264nyGGXSxcVPoQ-XpocnKg"
+        }
+      },
       "appleTeamId": "9TRN25LLSZ"
     },
     "android": {
@@ -33,6 +38,11 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAQGw0EvRRKKOWEnPdTy4faNMDYH0nAMbo"
+        }
+      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.yuliavorotintseva.travelTrackerMobile"
@@ -56,10 +66,14 @@
         }
       ],
       [
-        "react-native-maps",
+        "expo-build-properties",
         {
-          "iosGoogleMapsApiKey": "AIzaSyD7LizMzoxM264nyGGXSxcVPoQ-XpocnKg",
-          "androidGoogleMapsApiKey": "AIzaSyAQGw0EvRRKKOWEnPdTy4faNMDYH0nAMbo"
+          "ios": {
+            "useFrameworks": "static"
+          },
+          "android": {
+            "extraMavenRepos": ["https://jitpack.io"]
+          }
         }
       ]
     ],

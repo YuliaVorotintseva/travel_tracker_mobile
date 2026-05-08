@@ -31,6 +31,7 @@ export const MyProfile: FC = () => {
   const [error, setError] = useState<string | null>(null);
   const {
     control,
+    reset,
     handleSubmit,
     formState: { isDirty, isSubmitting },
   } = useForm<EditProfileFormData>({
@@ -52,11 +53,32 @@ export const MyProfile: FC = () => {
       });
   }, []);
 
+  useEffect(() => {
+    reset({
+      full_name: user?.user_metadata["full_name"],
+      email: user?.email,
+    });
+  }, [user]);
+
   const onSubmit = handleSubmit(async (input: EditProfileFormData) => {
     const editedData = {
       id: user?.id,
       ...input,
     };
+
+    const { data: updatedProfile, error } = await supabase
+      .from("profiles")
+      .update(editedData)
+      .eq("id", user?.id)
+      .select()
+      .single();
+
+    if (!!error) {
+      throw error;
+    }
+
+    setUser(updatedProfile);
+    console.log("User was successfuly updated!");
   });
 
   return (

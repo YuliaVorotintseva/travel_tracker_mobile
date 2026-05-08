@@ -1,4 +1,3 @@
-import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { useCallback, useState } from "react";
 import { supabase } from "../lib/supabase";
@@ -16,13 +15,6 @@ export const useAvatarUpload = (userId: string) => {
       }
 
       const fileExt = asset.uri.split(".").pop()?.toLowerCase() || "jpg";
-      const fileBase64 = await FileSystem.readAsStringAsync(asset.uri, {
-        encoding: "base64",
-      });
-      const fileBlob = await fetch(
-        `image/${fileExt};base64,${fileBase64}`,
-      ).then((r) => r.blob());
-
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${userId}/${fileName}`;
 
@@ -33,16 +25,26 @@ export const useAvatarUpload = (userId: string) => {
       }
 
       const mimeType = asset.mimeType || `image/${fileExt}`;
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, fileBlob, { contentType: mimeType, upsert: true });
 
-      if (uploadError) throw uploadError;
+      const formData = new FormData();
+      formData.append("file", {
+        uri: asset.uri,
+        name: fileName,
+        type: mimeType,
+      } as any);
+
+      const { data: uploadData, error } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, formData, { contentType: mimeType, upsert: true });
+
+      console.log(uploadData);
+      if (error) throw error;
 
       const {
         data: { publicUrl },
       } = supabase.storage.from("avatars").getPublicUrl(filePath);
 
+      console.log(publicUrl);
       const { error: profileError } = await supabase
         .from("profiles")
         .update({ avatar_url: publicUrl })
@@ -60,7 +62,7 @@ export const useAvatarUpload = (userId: string) => {
     if (status !== "granted") throw new Error("Доступ к галерее запрещён");
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,

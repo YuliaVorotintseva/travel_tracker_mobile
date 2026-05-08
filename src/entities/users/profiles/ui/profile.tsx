@@ -2,7 +2,7 @@ import { Image, Text, View } from "react-native";
 
 import { BackIcon, UserIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
-import { UserProfile } from "@/src/shared/types";
+import { Profiles } from "@/src/shared/types/api/generated";
 import { IconBackButton } from "@/src/shared/ui";
 import { getFormatDate } from "@/src/shared/utils";
 import { FC, useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import { getStyles } from "./styles";
 export const Profile: FC<{ userId: string }> = ({ userId }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<Profiles | null>(null);
 
   useEffect(() => {
     const init = async () => {

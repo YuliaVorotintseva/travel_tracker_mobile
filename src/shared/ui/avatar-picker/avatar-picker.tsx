@@ -63,6 +63,9 @@ export const AvatarPicker = ({
       </TouchableOpacity>
 
       {error && <Text style={styles.error}>{error}</Text>}
+      {(() => {
+        if (!!error) console.error(error);
+      })()}
 
       <Modal
         visible={modalVisible}

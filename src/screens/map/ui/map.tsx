@@ -1,12 +1,17 @@
-import { Loader } from "@/src/shared/ui/loaders";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+
+import { useTheme } from "@/src/shared/lib";
+import { Loader } from "@/src/shared/ui/loaders";
 import { useGetCurrentLocation } from "../model";
+import { getStyles } from "./styles";
 
 export const MapScreen = () => {
   const router = useRouter();
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const { data, loading, fetchLocation } = useGetCurrentLocation();
 
   useEffect(() => {
@@ -54,31 +59,3 @@ export const MapScreen = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  loading: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  containerBtns: {
-    gap: 20,
-  },
-  btn: {
-    top: 50,
-    left: 25,
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: "white",
-    alignSelf: "flex-start",
-  },
-  text: {
-    fontWeight: "600",
-  },
-});

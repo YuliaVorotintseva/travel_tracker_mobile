@@ -4,7 +4,6 @@ import { Image, Text, View } from "react-native";
 import { ShareIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { TripWithMembers } from "@/src/shared/types";
-import { getFormatDate } from "@/src/shared/utils";
 import { User } from "@supabase/supabase-js";
 import { getStyles } from "./styles";
 
@@ -29,7 +28,7 @@ export const TripCard: FC<{ trip: TripWithMembers }> = ({ trip }) => {
       <View style={styles.header}>
         <Text style={styles.text}>{trip.title}</Text>
         <Text style={styles.text}>
-          {getFormatDate(new Date(trip.created_at!))}
+          {`Members: ${trip.trip_members.length}`}
         </Text>
       </View>
       <View style={styles.content}>
