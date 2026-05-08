@@ -6,9 +6,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BackIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
-import { CURRENCIES, Currency } from "@/src/shared/types";
-import { Trips } from "@/src/shared/types/api/generated";
+import { CURRENCIES, Currency, TripWithMembers } from "@/src/shared/types";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
+import { ActivitiesList } from "@/src/widgets/activities_list/ui/activities_list";
+import { TripMembersList } from "@/src/widgets/trip_members_list";
 import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
 
@@ -25,7 +26,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const router = useRouter();
-  const [trip, setTrip] = useState<Trips | null>(null);
+  const [trip, setTrip] = useState<TripWithMembers | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
   const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
@@ -250,6 +251,17 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
               )}
             />
           </View>
+          <View>
+            <Text>
+              {!!trip && trip.trip_members.length
+                ? `Trip members(${trip.trip_members.length}):`
+                : "There is no any member yet"}
+            </Text>
+            {!!trip && trip.trip_members.length && (
+              <TripMembersList tripId={tripId} />
+            )}
+          </View>
+          <ActivitiesList tripId={tripId} />
           {!!error && <Text style={styles.error}>{`Problem: ${error}`}</Text>}
           <Pressable onPress={onSubmit} style={styles.confirmBtn}>
             <Text

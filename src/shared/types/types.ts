@@ -5,10 +5,23 @@ export type Theme = "light" | "dark";
 
 export type Currency = "USD" | "EUR" | "RUB" | "GBP";
 
+export type TripMember = {
+  user_id: string;
+  role: "owner" | "editor" | "viewer";
+};
+
 export type TripWithMembers = Trips & {
-  trip_members: {
-    user_id: string;
-    role: "owner" | "editor" | "viewer";
+  trip_members: TripMember[];
+};
+
+export type TripMemberWithProfile = {
+  user_id: string;
+  role: "owner" | "editor" | "viewer";
+  joined_at: string;
+  profiles: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
   }[];
 };
 
