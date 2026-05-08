@@ -10,6 +10,7 @@ web-build/
 expo-env.d.ts
 
 src/shared/types/api
+src/shared/types/supabase.ts
 
 # Native
 .kotlin/
