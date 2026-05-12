@@ -19,7 +19,19 @@ export const getStyles = (theme: Theme) =>
       flexDirection: "row",
       justifyContent: "space-between",
     },
-    content: {},
+    content: {
+      marginVertical: 20,
+    },
+    moveToMapBtn: {
+      backgroundColor: Styles[theme].IconContrast,
+      padding: 10,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    moveToMapBtnText: {
+      fontSize: 16,
+      fontWeight: 500,
+    },
     img: {
       marginTop: 12,
       marginBottom: 20,

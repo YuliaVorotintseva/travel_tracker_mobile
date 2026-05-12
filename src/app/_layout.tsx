@@ -15,6 +15,7 @@ const App = () => {
         <Stack.Screen name="index" />
         <Stack.Screen name="sign-up" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="trip" />
 
         <Stack.Screen
           name="settings"
@@ -27,21 +28,21 @@ const App = () => {
           name="create-trip"
           options={{
             presentation: "transparentModal",
-            animation: "slide_from_bottom",
+            animation: "fade",
           }}
         />
         <Stack.Screen
           name="edit-trip"
           options={{
             presentation: "transparentModal",
-            animation: "slide_from_bottom",
+            animation: "fade",
           }}
         />
         <Stack.Screen
           name="/users/my_profile"
           options={{
             presentation: "transparentModal",
-            animation: "slide_from_bottom",
+            animation: "fade",
           }}
         />
       </Stack>

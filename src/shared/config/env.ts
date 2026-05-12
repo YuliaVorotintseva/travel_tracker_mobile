@@ -3,6 +3,7 @@ const supabaseAnon = process.env.EXPO_PUBLIC_SUPABASE_ANON;
 const webClientId = process.env.EXPO_PUBLIC_WEB_CLIENT_ID;
 const androidClientId = process.env.EXPO_PUBLIC_ANDROID_CLIEND_ID;
 const iosClientId = process.env.EXPO_PUBLIC_IOS_CLIENT_ID;
+const googleMapsKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY;
 
 type EnvShape = {
   SUPABASE_URL: string;
@@ -10,6 +11,7 @@ type EnvShape = {
   WEB_CLIENT_ID: string;
   ANDROID_CLIENT_ID: string;
   IOS_CLIENT_ID: string;
+  GOOGLE_MAPS_KEY: string;
 };
 
 export const ENV: EnvShape = {
@@ -26,4 +28,5 @@ export const ENV: EnvShape = {
   IOS_CLIENT_ID:
     iosClientId ||
     "166459366038-mqigb285j43lvm4c4v42ktiptj50702m.apps.googleusercontent.com",
+  GOOGLE_MAPS_KEY: googleMapsKey || "AIzaSyBCxb8FLp-JMTGgUkYtfsoFlrO1QJwySX0",
 };

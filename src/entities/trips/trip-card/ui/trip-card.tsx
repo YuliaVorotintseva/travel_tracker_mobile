@@ -1,13 +1,15 @@
 import { FC, useEffect, useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 
 import { ShareIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { TripWithMembers } from "@/src/shared/types";
 import { User } from "@supabase/supabase-js";
+import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
 
 export const TripCard: FC<{ trip: TripWithMembers }> = ({ trip }) => {
+  const router = useRouter();
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [author, setAuthor] = useState<User | null>(null);
@@ -32,10 +34,12 @@ export const TripCard: FC<{ trip: TripWithMembers }> = ({ trip }) => {
         </Text>
       </View>
       <View style={styles.content}>
-        {
-          // activities
-          // members
-        }
+        <Pressable
+          style={styles.moveToMapBtn}
+          onPress={() => router.push(`/trip/${trip.id}`)}
+        >
+          <Text style={styles.moveToMapBtnText}>Move to trip map</Text>
+        </Pressable>
       </View>
       <View style={styles.footer}>
         <View style={styles.userInfo}>

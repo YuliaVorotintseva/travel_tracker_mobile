@@ -253,7 +253,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
           </View>
           <View>
             <Text>
-              {!!trip && trip.trip_members.length
+              {!!trip?.trip_members && trip.trip_members.length > 0
                 ? `Trip members(${trip.trip_members.length}):`
                 : "There is no any member yet"}
             </Text>

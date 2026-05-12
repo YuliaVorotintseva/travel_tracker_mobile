@@ -25,9 +25,36 @@ export type TripMemberWithProfile = {
   }[];
 };
 
+export interface Activity {
+  id: string;
+  trip_id: string;
+  title: string;
+  type:
+    | "transport"
+    | "sightseeing"
+    | "food"
+    | "rest"
+    | "accommodation"
+    | "custom";
+  start_time: string | null;
+  end_time: string | null;
+  location: { lat: number; lng: number; address?: string } | null;
+  notes: string | null;
+  created_by: string;
+}
+
 export const CURRENCIES: SelectOption<Currency>[] = [
   { label: "USD 🇺🇸", value: "USD" },
   { label: "EUR 🇪🇺", value: "EUR" },
   { label: "RUB 🇷🇺", value: "RUB" },
   { label: "GBP 🇬🇧", value: "GBP" },
+];
+
+export const ACTIVITY_TYPES: SelectOption<Activity["type"]>[] = [
+  { label: "🏛️ Достопримечательность", value: "sightseeing" },
+  { label: "🚗 Транспорт", value: "transport" },
+  { label: "🍽️ Еда", value: "food" },
+  { label: "🏨 Проживание", value: "accommodation" },
+  { label: "☕ Отдых", value: "rest" },
+  { label: "📌 Другое", value: "custom" },
 ];

@@ -7,11 +7,9 @@ import { useTheme } from "@/src/shared/lib";
 import { useAuth } from "@/src/shared/lib/auth-context";
 import { Styles } from "@/src/shared/styles";
 import { HapticTab } from "@/src/shared/ui/haptic-tab";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const { isAuthenticated } = useAuth();
-  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { theme } = useTheme();
 

@@ -3,9 +3,9 @@ import React, { useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
+import { useGetCurrentLocation } from "@/src/shared/hooks";
 import { useTheme } from "@/src/shared/lib";
 import { Loader } from "@/src/shared/ui/loaders";
-import { useGetCurrentLocation } from "../model";
 import { getStyles } from "./styles";
 
 export const MapScreen = () => {
