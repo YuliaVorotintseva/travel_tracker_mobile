@@ -17,12 +17,12 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import {
+  defaultProfileValues,
+  ProfileFormData,
+  ProfileFormResolver,
+} from "../lib/form-resolver";
 import { getStyles } from "./styles";
-
-type EditProfileFormData = {
-  full_name: string;
-  email: string;
-};
 
 export const MyProfile: FC = () => {
   const { theme } = useTheme();
@@ -34,11 +34,10 @@ export const MyProfile: FC = () => {
     reset,
     handleSubmit,
     formState: { isDirty, isSubmitting },
-  } = useForm<EditProfileFormData>({
-    defaultValues: {
-      full_name: "",
-      email: "",
-    },
+  } = useForm<ProfileFormData>({
+    defaultValues: defaultProfileValues,
+    resolver: ProfileFormResolver,
+    mode: "onChange",
   });
 
   useEffect(() => {
@@ -60,26 +59,28 @@ export const MyProfile: FC = () => {
     });
   }, [user]);
 
-  const onSubmit = handleSubmit(async (input: EditProfileFormData) => {
-    const editedData = {
-      id: user?.id,
-      ...input,
-    };
+  const onSubmit = handleSubmit(
+    async (input: { full_name: string; email: string }) => {
+      const editedData = {
+        id: user?.id,
+        ...input,
+      };
 
-    const { data: updatedProfile, error } = await supabase
-      .from("profiles")
-      .update(editedData)
-      .eq("id", user?.id)
-      .select()
-      .single();
+      const { data: updatedProfile, error } = await supabase
+        .from("profiles")
+        .update(editedData)
+        .eq("id", user?.id)
+        .select()
+        .single();
 
-    if (!!error) {
-      throw error;
-    }
+      if (!!error) {
+        throw error;
+      }
 
-    setUser(updatedProfile);
-    console.log("User was successfuly updated!");
-  });
+      setUser(updatedProfile);
+      console.log("User was successfuly updated!");
+    },
+  );
 
   return (
     <KeyboardAvoidingView

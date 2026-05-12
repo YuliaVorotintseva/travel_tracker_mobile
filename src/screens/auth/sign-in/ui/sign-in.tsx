@@ -22,7 +22,11 @@ import { useTheme } from "@/src/shared/lib/theme-context";
 import { Styles } from "@/src/shared/styles";
 import { PasswordInput } from "@/src/shared/ui/inputs";
 import { getStyles } from "../../styles";
-import { SignInFormData, defaultSignInValues } from "../lib/form-resolver";
+import {
+  SignInFormData,
+  SignInFormResolver,
+  defaultSignInValues,
+} from "../lib/form-resolver";
 import { SignInParams, useLogin } from "../model";
 
 export const SignInScreen: FC = () => {
@@ -38,6 +42,7 @@ export const SignInScreen: FC = () => {
     formState: { isDirty, isSubmitting },
   } = useForm<SignInFormData>({
     defaultValues: defaultSignInValues,
+    resolver: SignInFormResolver,
     mode: "onChange",
   });
 

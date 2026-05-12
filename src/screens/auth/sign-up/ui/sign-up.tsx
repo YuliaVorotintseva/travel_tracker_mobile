@@ -16,7 +16,11 @@ import { useTheme } from "@/src/shared/lib/theme-context";
 import { Styles } from "@/src/shared/styles";
 import { PasswordInput } from "@/src/shared/ui/inputs";
 import { getStyles } from "../../styles";
-import { defaultSignUpValues, SignUpFormData } from "../lib";
+import {
+  defaultSignUpValues,
+  SignUpFormData,
+  SignUpFormResolver,
+} from "../lib";
 import { SignUpParams, useLogup } from "../model";
 
 export const SignUpScreen: FC = () => {
@@ -30,7 +34,8 @@ export const SignUpScreen: FC = () => {
     formState: { isDirty, isSubmitting },
   } = useForm<SignUpFormData>({
     defaultValues: defaultSignUpValues,
-    mode: "onBlur",
+    resolver: SignUpFormResolver,
+    mode: "onChange",
   });
 
   const onSubmit = handleSubmit(async (input: SignUpParams) => {

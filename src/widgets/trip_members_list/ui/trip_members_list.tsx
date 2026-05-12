@@ -37,7 +37,7 @@ export const TripMembersList: FC<{ tripId: string }> = ({ tripId }) => {
                     style={styles.avatar}
                     source={
                       item.profiles[0].avatar_url ??
-                      require("./assets/images/user.svg")
+                      require("../../../../assets/images/user.svg")
                     }
                   />
                   <Text>{item.profiles[0].full_name}</Text>
