@@ -42,8 +42,9 @@ export const MapScreen = () => {
             latitude: Number(data?.latitude.toFixed(6)),
             longitude: Number(data?.longitude.toFixed(6)),
           }}
-          title="My Marker"
-          description="This is a marker"
+          title="My location"
+          description="Default location for trip maps"
+          icon={require("@/assets/images/location.png")}
         />
       </MapView>
 

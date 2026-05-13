@@ -5,15 +5,16 @@ import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import MapView, { Marker, Polyline, Region } from "react-native-maps";
 
 import {
-  createActivity,
   CreateActivityModal,
-  getTripActivities,
+  useActivitiesActions,
 } from "@/src/features/activities/create_activity";
+import { EditActivityModal } from "@/src/features/activities/edit_activity/ui/edit_activity";
 import { useGetCurrentLocation } from "@/src/shared/hooks";
 import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { Activity } from "@/src/shared/types";
 import { Loader } from "@/src/shared/ui/loaders";
+import { ActivitiesListModal } from "@/src/widgets/activities_list/ui/activities_list_modal";
 import { Coordinate, fetchRoadRoute } from "../model/trip_map_actions";
 import { useGetStyle } from "./styles";
 
@@ -24,13 +25,16 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
     loading: loadingFetchCurrentLocation,
     fetchLocation,
   } = useGetCurrentLocation();
-  const [activities, setActivities] = useState<Activity[]>([]);
   const [selectedCoord, setSelectedCoord] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [isCreateActivityModalVisible, setisCreateActivityModalVisible] =
+    useState(false);
+  const [isEditActivityModalVisible, setIsEditActivityModalVisible] =
+    useState(false);
   const [showRoute, setShowRoute] = useState(true);
+  const [isActivitiesListOpen, setIsActivitiesListOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
     null,
   );
@@ -39,6 +43,15 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   const mapRef = useRef<MapView>(null);
   const { theme } = useTheme();
   const styles = useGetStyle(theme);
+  const {
+    activities,
+    loadingActivities,
+    routePoints,
+    fetchActivities,
+    createActivity,
+    updateActivity,
+    clear,
+  } = useActivitiesActions();
 
   useEffect(() => {
     fetchLocation();
@@ -46,22 +59,11 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
 
   useEffect(() => {
     if (!tripId) return;
-    getTripActivities(tripId)
-      .then(setActivities)
-      .catch((error: unknown) => console.error(error));
-  }, [tripId]);
 
-  const routePoints = useMemo(() => {
-    return activities
-      .filter((a) => a.location?.lat && a.location?.lng)
-      .sort((a, b) => {
-        if (!a.start_time && !b.start_time) return 0;
-        if (!a.start_time) return 1;
-        if (!b.start_time) return -1;
-        return a.start_time.localeCompare(b.start_time);
-      })
-      .map((a) => ({ latitude: a.location!.lat, longitude: a.location!.lng }));
-  }, [activities]);
+    fetchActivities(tripId);
+
+    return () => clear();
+  }, [tripId]);
 
   useEffect(() => {
     if (routePoints.length < 2) {
@@ -105,19 +107,30 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
 
   const handleMapPress = (event: any) => {
     setSelectedCoord(event.nativeEvent.coordinate);
-    setModalVisible(true);
+    setisCreateActivityModalVisible(true);
   };
 
   const handleAddActivity = async (data: Partial<Activity>) => {
     if (!tripId || !selectedCoord) return;
     try {
-      const newActivity = await createActivity(tripId, {
+      await createActivity(tripId, {
         ...data,
         location: { lat: selectedCoord.latitude, lng: selectedCoord.longitude },
       });
-      setActivities((prev) => [...prev, newActivity]);
-      setModalVisible(false);
+      setisCreateActivityModalVisible(false);
       setSelectedCoord(null);
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
+
+  const handleEditActivity = async (
+    activityId: string,
+    data: Partial<Activity>,
+  ) => {
+    try {
+      await updateActivity(activityId, data);
+      setIsEditActivityModalVisible(false);
     } catch (error: unknown) {
       console.error(error);
     }
@@ -145,7 +158,12 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   const hasPoints = routePoints.length > 0;
   const showEmptyState = activities.length === 0;
 
-  if (loadingFetchCurrentLocation || loadingRoute || !userLocation) {
+  if (
+    loadingFetchCurrentLocation ||
+    loadingActivities ||
+    loadingRoute ||
+    !userLocation
+  ) {
     return (
       <View style={styles.loading}>
         <Loader />
@@ -173,7 +191,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
               }}
               title={`${i + 1}. ${activity.title}`}
               description={activity.type}
-              onPress={() => setSelectedActivity(activity)}
+              icon={require("@/assets/images/location.png")}
             />
           ))}
 
@@ -181,8 +199,8 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
           <Polyline
             // coordinates={roadPath || routePoints}
             coordinates={routePoints}
-            strokeColor={Styles[theme].BorderPositive}
-            strokeWidth={2}
+            strokeColor={Styles[theme].BorderDisabled}
+            strokeWidth={1}
             lineCap="round"
             lineJoin="round"
             zIndex={10}
@@ -202,9 +220,17 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
         </View>
       )}
 
-      <Pressable style={styles.backBtn} onPress={() => router.back()}>
-        <Text style={styles.btnText}>Back to my trips</Text>
-      </Pressable>
+      <View style={styles.settings}>
+        <Pressable style={styles.backBtn} onPress={() => router.back()}>
+          <Text style={styles.btnText}>Back to my trips</Text>
+        </Pressable>
+        <Pressable
+          style={styles.activityListBtn}
+          onPress={() => setIsActivitiesListOpen(true)}
+        >
+          <Text style={styles.btnText}>Activities list</Text>
+        </Pressable>
+      </View>
 
       <View style={styles.controls}>
         <TouchableOpacity style={styles.btn} onPress={centerOnUser}>
@@ -241,11 +267,31 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
       </View>
 
       <CreateActivityModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
+        visible={isCreateActivityModalVisible}
+        onClose={() => setisCreateActivityModalVisible(false)}
         onSubmit={handleAddActivity}
         initialCoord={selectedCoord}
       />
+
+      {selectedActivity && (
+        <EditActivityModal
+          visible={isEditActivityModalVisible}
+          onClose={() => setIsEditActivityModalVisible(false)}
+          onSubmit={handleEditActivity}
+          activity={selectedActivity}
+        />
+      )}
+
+      {isActivitiesListOpen && (
+        <ActivitiesListModal
+          onPressOverlay={() => setIsActivitiesListOpen(false)}
+          onPressActivity={(item: Activity) => {
+            setSelectedActivity(item);
+            setIsEditActivityModalVisible(true);
+          }}
+          activities={activities}
+        />
+      )}
     </View>
   );
 };

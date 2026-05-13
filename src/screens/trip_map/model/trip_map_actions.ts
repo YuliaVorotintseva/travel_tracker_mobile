@@ -1,3 +1,6 @@
+import { Activity } from "@/src/shared/types";
+import * as Location from "expo-location";
+
 export interface Coordinate {
   latitude: number;
   longitude: number;
@@ -69,4 +72,48 @@ export const fetchRoadRoute = async (
     console.error("Route fetch failed:", err);
     return null;
   }
+};
+
+const fetchAddress = async (
+  lat: number,
+  lng: number,
+): Promise<string | null> => {
+  try {
+    const [place] = await Location.reverseGeocodeAsync({
+      latitude: lat,
+      longitude: lng,
+    });
+    if (!place) return null;
+
+    const parts = [place.name, place.street, place.city, place.region].filter(
+      Boolean,
+    );
+    return parts.length > 0
+      ? parts.join(", ")
+      : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  } catch (error: unknown) {
+    console.error("Reverse geocoding failed:", error);
+    return null;
+  }
+};
+
+export const addAddressesToActivities = async (
+  activities: Activity[],
+): Promise<Activity[]> => {
+  const results = await Promise.allSettled(
+    activities.map(async (activity) => {
+      if (!activity.location?.lat || !activity.location.lng) return activity;
+      const address = await fetchAddress(
+        activity.location.lat,
+        activity.location.lng,
+      );
+      return { ...activity, location: { ...activity.location, address } };
+    }),
+  );
+
+  return results
+    .filter(
+      (r): r is PromiseFulfilledResult<Activity> => r.status === "fulfilled",
+    )
+    .map((r) => r.value);
 };

@@ -8,7 +8,6 @@ import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { CURRENCIES, Currency, TripWithMembers } from "@/src/shared/types";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
-import { ActivitiesList } from "@/src/widgets/activities_list/ui/activities_list";
 import { TripMembersList } from "@/src/widgets/trip_members_list";
 import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
@@ -261,7 +260,6 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
               <TripMembersList tripId={tripId} />
             )}
           </View>
-          <ActivitiesList tripId={tripId} />
           {!!error && <Text style={styles.error}>{`Problem: ${error}`}</Text>}
           <Pressable onPress={onSubmit} style={styles.confirmBtn}>
             <Text

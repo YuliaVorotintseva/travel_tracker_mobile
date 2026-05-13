@@ -15,40 +15,48 @@ import { styles } from "../../styles";
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (data: Partial<Activity>) => void;
-  initialCoord: { latitude: number; longitude: number } | null;
+  onSubmit: (activityId: string, data: Partial<Activity>) => void;
+  activity: Activity;
 }
 
-type CreateActivityFormData = {
+type EditActivityFormData = {
   title: string;
   type: Activity["type"];
-  start_date: string;
+  start_time: string;
   notes: string;
 };
 
-export const CreateActivityModal = ({
+export const EditActivityModal = ({
   visible,
   onClose,
   onSubmit,
-  initialCoord,
+  activity,
 }: Props) => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
   const {
     control,
+    reset,
     handleSubmit,
     formState: { isDirty, isSubmitting },
-  } = useForm<CreateActivityFormData>({
+  } = useForm<EditActivityFormData>({
     defaultValues: {
-      title: "",
-      type: "custom",
-      start_date: "--:--",
+      title: activity.title,
+      type: activity.type,
+      start_time: activity.start_time,
+      notes: activity.notes,
     },
     mode: "onBlur",
   });
 
-  const handleSave = handleSubmit(async (input: CreateActivityFormData) =>
-    onSubmit(input),
-  );
+  const handleSave = handleSubmit(async (input: EditActivityFormData) => {
+    onSubmit(activity.id, input);
+    reset({
+      title: input.title,
+      type: input.type,
+      start_time: input.start_time,
+      notes: input.notes,
+    });
+  });
 
   return (
     <Modal
@@ -66,12 +74,9 @@ export const CreateActivityModal = ({
 
         <View style={styles.sheet}>
           <Text style={styles.title}>Добавить точку</Text>
-          {initialCoord && (
-            <Text style={styles.coordText}>
-              📍 {initialCoord.latitude.toFixed(4)},{" "}
-              {initialCoord.longitude.toFixed(4)}
-            </Text>
-          )}
+          <Text style={styles.coordText}>
+            {`📍 ${activity.location.lat.toFixed(4)}, ${activity.location.lng.toFixed(4)}`}
+          </Text>
 
           <Controller
             name="title"
@@ -113,7 +118,7 @@ export const CreateActivityModal = ({
           />
 
           <Controller
-            name="start_date"
+            name="start_time"
             control={control}
             render={({ field: { onChange, value } }) => (
               <View>
@@ -147,9 +152,9 @@ export const CreateActivityModal = ({
               fieldState: { error },
             }) => (
               <View>
-                <Text style={styles.label}>Description</Text>
+                <Text style={styles.label}>Notes</Text>
                 <TextInput
-                  placeholder="Enter description of the trip"
+                  placeholder="Enter your notes"
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -166,7 +171,7 @@ export const CreateActivityModal = ({
             onPress={handleSave}
             disabled={!isDirty || isSubmitting}
           >
-            <Text style={styles.submitText}>Save activity</Text>
+            <Text style={styles.submitText}>Save changes</Text>
           </TouchableOpacity>
         </View>
       </View>

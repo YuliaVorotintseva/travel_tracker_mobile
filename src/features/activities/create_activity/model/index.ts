@@ -1,1 +1,1 @@
-export * from "./activitiesActions";
+export * from "./use_activities_actions";

@@ -43,9 +43,14 @@ export const TripCard: FC<{ trip: TripWithMembers }> = ({ trip }) => {
       </View>
       <View style={styles.footer}>
         <View style={styles.userInfo}>
-          {!!author?.user_metadata["avatar_url"] && (
+          {!!author?.user_metadata["avatar_url"] ? (
             <Image
               source={{ uri: author?.user_metadata["avatar_url"] }}
+              style={styles.avatar}
+            />
+          ) : (
+            <Image
+              source={require("@/assets/images/account24.png")}
               style={styles.avatar}
             />
           )}

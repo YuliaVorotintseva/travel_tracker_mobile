@@ -1,3 +1,4 @@
+import { Styles } from "@/src/shared/styles";
 import { Theme } from "@/src/shared/types";
 import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -56,7 +57,11 @@ export const useGetStyle = (theme: Theme) => {
       shadowRadius: 6,
       elevation: 3,
     },
-    fitBtn: { backgroundColor: "#2563EB" },
+    fitBtn: { backgroundColor: Styles[theme].IconAccent },
+    settings: {
+      top: insets.top + 16,
+      left: 16,
+    },
     btnText: { color: "#fff", fontSize: 14, fontWeight: "600" },
     loading: {
       flex: 1,
@@ -64,11 +69,15 @@ export const useGetStyle = (theme: Theme) => {
       justifyContent: "center",
     },
     backBtn: {
-      top: insets.top + 50,
-      left: 16,
       padding: 10,
       borderRadius: 20,
       backgroundColor: "#000",
+      alignSelf: "flex-start",
+    },
+    activityListBtn: {
+      padding: 10,
+      borderRadius: 20,
+      backgroundColor: Styles[theme].IconAccent,
       alignSelf: "flex-start",
     },
   });

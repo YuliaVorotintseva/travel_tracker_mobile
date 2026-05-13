@@ -52,7 +52,7 @@ export const AvatarPicker = ({
             source={
               currentAvatarUrl
                 ? { uri: currentAvatarUrl }
-                : require("../../../../assets/images/user.svg")
+                : require("@/assets/images/account80.png")
             }
             style={styles.avatar}
           />

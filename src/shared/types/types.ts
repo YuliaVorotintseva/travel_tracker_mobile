@@ -1,5 +1,5 @@
 import { SelectOption } from "../ui";
-import { Trips } from "./api/generated";
+import { Activities, Trips } from "./api/generated";
 
 export type Theme = "light" | "dark";
 
@@ -25,10 +25,7 @@ export type TripMemberWithProfile = {
   }[];
 };
 
-export interface Activity {
-  id: string;
-  trip_id: string;
-  title: string;
+export type Activity = Activities & {
   type:
     | "transport"
     | "sightseeing"
@@ -36,12 +33,8 @@ export interface Activity {
     | "rest"
     | "accommodation"
     | "custom";
-  start_time: string | null;
-  end_time: string | null;
   location: { lat: number; lng: number; address?: string } | null;
-  notes: string | null;
-  created_by: string;
-}
+};
 
 export const CURRENCIES: SelectOption<Currency>[] = [
   { label: "USD 🇺🇸", value: "USD" },
