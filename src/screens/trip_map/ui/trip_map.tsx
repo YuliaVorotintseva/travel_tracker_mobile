@@ -181,7 +181,9 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
         onPress={handleMapPress}
         showsUserLocation={!!userLocation}
         customMapStyle={
-          theme === "dark" ? require("@/src/shared/styles/map_style.json") : {}
+          theme === "dark"
+            ? require("@/src/shared/styles/map_dark_style.json")
+            : require("@/src/shared/styles/map_light_style.json")
         }
       >
         {activities

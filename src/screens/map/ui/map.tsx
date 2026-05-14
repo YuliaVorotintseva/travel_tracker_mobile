@@ -37,7 +37,9 @@ export const MapScreen = () => {
           longitudeDelta: 0.0421,
         }}
         customMapStyle={
-          theme === "dark" ? require("@/src/shared/styles/map_style.json") : {}
+          theme === "dark"
+            ? require("@/src/shared/styles/map_dark_style.json")
+            : require("@/src/shared/styles/map_light_style.json")
         }
       >
         <Marker
