@@ -27,7 +27,7 @@ export const useActivityStore = create<ActivityState>()(
       error: null,
 
       fetchActivities: async (tripId: string) => {
-        set({ tripId, loading: true, error: null });
+        set({ tripId: tripId, loading: true, error: null });
         try {
           const { data, error } = await supabase
             .from("activities")

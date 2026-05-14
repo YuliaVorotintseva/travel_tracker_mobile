@@ -22,7 +22,7 @@ interface Props {
 type CreateActivityFormData = {
   title: string;
   type: Activity["type"];
-  start_date: string;
+  start_time: string;
   notes: string;
 };
 
@@ -42,7 +42,7 @@ export const CreateActivityModal = ({
     defaultValues: {
       title: "",
       type: "custom",
-      start_date: "--:--",
+      start_time: "--:--",
     },
     mode: "onBlur",
   });
@@ -114,7 +114,7 @@ export const CreateActivityModal = ({
           />
 
           <Controller
-            name="start_date"
+            name="start_time"
             control={control}
             render={({ field: { onChange, value } }) => (
               <View>

@@ -28,7 +28,7 @@ export const useGetStyle = () => {
     },
     coordText: {
       fontSize: 13,
-      color: Styles[theme].TextTertiary,
+      color: Styles[theme].TextSecondary,
       marginBottom: 16,
     },
     input: {
@@ -38,7 +38,6 @@ export const useGetStyle = () => {
       padding: 14,
       fontSize: 16,
       backgroundColor: Styles[theme].BgSecondary,
-      color: Styles[theme].TextTertiary,
       marginBottom: 12,
     },
     label: {
@@ -67,7 +66,7 @@ export const useGetStyle = () => {
       marginTop: 8,
     },
     submitText: {
-      color: Styles[theme].TextPrimary,
+      color: Styles[theme].TextOnColor,
       fontSize: 16,
       fontWeight: "600",
     },

@@ -54,8 +54,8 @@ export const MyProfile: FC = () => {
 
   useEffect(() => {
     reset({
-      full_name: user?.user_metadata["full_name"],
-      email: user?.email,
+      full_name: !!user?.user_metadata ? user?.user_metadata["full_name"] : "",
+      email: !!user ? user?.email : "",
     });
   }, [user]);
 
@@ -126,7 +126,9 @@ export const MyProfile: FC = () => {
               <View style={styles.uploadImgArea}>
                 <AvatarPicker
                   userId={user?.id!}
-                  currentAvatarUrl={user?.user_metadata["avatar_url"]}
+                  currentAvatarUrl={
+                    !!user?.user_metadata && user?.user_metadata["avatar_url"]
+                  }
                 />
               </View>
 

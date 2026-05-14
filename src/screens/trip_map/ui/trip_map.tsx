@@ -289,6 +289,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
       {isActivitiesListOpen && (
         <ActivitiesListModal
           onPressOverlay={() => setIsActivitiesListOpen(false)}
+          onPressCloseIcon={() => setIsActivitiesListOpen(false)}
           onPressActivity={(item: Activity) => {
             setSelectedActivity(item);
             setIsEditActivityModalVisible(true);

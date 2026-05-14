@@ -30,7 +30,7 @@ export const TripCard: FC<{ trip: TripWithMembers }> = ({ trip }) => {
       <View style={styles.header}>
         <Text style={styles.text}>{trip.title}</Text>
         <Text style={styles.text}>
-          {`Members: ${trip.trip_members.length}`}
+          {`Members: ${!!trip.trip_members ? trip.trip_members.length : 0}`}
         </Text>
       </View>
       <View style={styles.content}>

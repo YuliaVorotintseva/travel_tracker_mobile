@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useMyTripsStore } from "@/src/screens/trips/model/my_trips_store";
 import { BackIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
@@ -55,6 +56,7 @@ export const CreateTrip: FC = () => {
     },
     mode: "onBlur",
   });
+  const { addTrip } = useMyTripsStore();
 
   useEffect(() => {
     supabase.auth
@@ -72,15 +74,14 @@ export const CreateTrip: FC = () => {
       if (!userId) {
         return;
       }
-      console.log(input);
 
       const newTripData = {
         ...input,
-        start_date: startDate,
-        end_date: endDate,
-        currency,
         created_by: userId,
       };
+
+      const tempId = `temp_id_${Date.now().toString()}`;
+      addTrip({ id: tempId, ...newTripData });
 
       const { data, error } = await supabase
         .from("trips")

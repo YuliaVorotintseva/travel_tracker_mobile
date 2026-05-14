@@ -5,19 +5,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MyTripCard } from "@/src/entities/trips/my-trip-card/ui";
 import { supabase, useTheme } from "@/src/shared/lib";
-import { TripWithMembers } from "@/src/shared/types";
 import { CreateButton } from "@/src/shared/ui";
 import { Loader } from "@/src/shared/ui/loaders";
 import { useRouter } from "expo-router";
+import { useMyTripsStore } from "../model/my_trips_store";
 import { getStyles } from "./styles";
 
 export const MyTripsScreen: FC = () => {
   const router = useRouter();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const [myTrips, setMyTrips] = useState<TripWithMembers[] | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { trips: myTrips, loading, fetchTrips, removeTrip } = useMyTripsStore();
 
   useEffect(() => {
     supabase.auth
@@ -36,61 +35,16 @@ export const MyTripsScreen: FC = () => {
     let isMounted = true;
     const channel = supabase.channel(`trips-sync-${userId}`);
 
-    const fetchTrips = async () => {
-      try {
-        const [tripsAsCreator, tripsAsMember] = await Promise.all([
-          supabase
-            .from("trips")
-            .select(
-              "id, title, start_date, end_date, destination, currency, created_by, trip_members(user_id, role)",
-            )
-            .eq("created_by", userId),
-          supabase
-            .from("trips")
-            .select(
-              "id, title, start_date, end_date, destination, currency, created_by, trip_members(user_id, role)",
-            )
-            .eq("trip_members.user_id", userId),
-        ]);
-
-        if (!isMounted) return;
-
-        const error = tripsAsCreator.error || tripsAsMember.error;
-        if (error) {
-          console.error("Supabase fetch error:", error);
-          return;
-        }
-
-        const uniqueTrips = Array.from(
-          new Map(
-            [...tripsAsCreator.data, ...tripsAsMember.data].map((t) => [
-              t.id,
-              t,
-            ]),
-          ).values(),
-        );
-
-        setMyTrips(uniqueTrips);
-      } catch (err) {
-        console.error("Unexpected error:", err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    fetchTrips();
+    fetchTrips(userId);
 
     const tables = ["trips", "trip_members"] as const;
-    const events = ["INSERT", "UPDATE", "DELETE"] as const;
 
     tables.forEach((table) => {
-      events.forEach((event) => {
-        channel.on(
-          "postgres_changes",
-          { event, schema: "public", table },
-          fetchTrips,
-        );
-      });
+      channel.on(
+        "postgres_changes",
+        { event: "*", schema: "public", table },
+        () => fetchTrips(userId),
+      );
     });
 
     channel.subscribe((status) => {
@@ -104,6 +58,7 @@ export const MyTripsScreen: FC = () => {
   }, [userId]);
 
   const handleDelete = async (tripId: string) => {
+    removeTrip(tripId);
     const { error } = await supabase.from("trips").delete().eq("id", tripId);
 
     if (!!error) {

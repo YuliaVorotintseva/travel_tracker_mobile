@@ -3,6 +3,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useMyTripsStore } from "@/src/screens/trips/model/my_trips_store";
 import { BackIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
@@ -29,7 +30,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   const [error, setError] = useState<string | null>(null);
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
   const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
-
+  const { trips, updateTrip } = useMyTripsStore();
   const {
     control,
     reset,
@@ -48,21 +49,9 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   });
 
   useEffect(() => {
-    const init = async () => {
-      const { data, error } = await supabase
-        .from("trips")
-        .select("*")
-        .eq("id", tripId)
-        .maybeSingle();
-
-      if (!!error) {
-        setError((error as { message: string }).message);
-        console.error(error);
-      }
-
-      setTrip(data);
-    };
-    init();
+    const trip = trips.find((t) => t.id === tripId);
+    setTrip(trip ?? null);
+    console.log(trip);
   }, []);
 
   useEffect(() => {
@@ -84,6 +73,8 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
         id: tripId,
         ...input,
       };
+
+      updateTrip(tripId, editedData);
 
       const { data: updatedTrip, error } = await supabase
         .from("trips")
@@ -256,7 +247,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                 ? `Trip members(${trip.trip_members.length}):`
                 : "There is no any member yet"}
             </Text>
-            {!!trip && trip.trip_members.length && (
+            {!!trip && trip.trip_members && trip.trip_members.length && (
               <TripMembersList tripId={tripId} />
             )}
           </View>

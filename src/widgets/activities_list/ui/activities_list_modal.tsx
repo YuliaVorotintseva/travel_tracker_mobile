@@ -6,12 +6,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { CloseIcon } from "@/src/shared/icons";
 import { useTheme } from "@/src/shared/lib";
 import { Activity } from "@/src/shared/types";
-import { IconBackButton } from "@/src/shared/ui";
 import { getFormatDate } from "@/src/shared/utils";
 import { useGetStyles } from "./styles";
 
 type ActivitiesListModalProps = {
   onPressOverlay: () => void;
+  onPressCloseIcon: () => void;
   onPressActivity: (activity: Activity) => void;
   activities: Activity[];
 };
@@ -20,6 +20,7 @@ export const ActivitiesListModal: FC<ActivitiesListModalProps> = ({
   activities,
   onPressOverlay,
   onPressActivity,
+  onPressCloseIcon,
 }) => {
   const { theme } = useTheme();
   const styles = useGetStyles(theme);
@@ -28,7 +29,9 @@ export const ActivitiesListModal: FC<ActivitiesListModalProps> = ({
     <View style={styles.modalOverlay}>
       <Pressable style={StyleSheet.absoluteFill} onPress={onPressOverlay} />
       <SafeAreaView style={styles.modalContent}>
-        <IconBackButton icon={<CloseIcon />} />
+        <Pressable onPress={onPressCloseIcon}>
+          <CloseIcon />
+        </Pressable>
         <View style={{ flex: 1 }}>
           {!!activities && activities.length > 0 ? (
             <View style={{ flex: 1 }}>

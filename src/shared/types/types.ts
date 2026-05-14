@@ -11,7 +11,7 @@ export type TripMember = {
 };
 
 export type TripWithMembers = Trips & {
-  trip_members: TripMember[];
+  trip_members?: TripMember[];
 };
 
 export type TripMemberWithProfile = {

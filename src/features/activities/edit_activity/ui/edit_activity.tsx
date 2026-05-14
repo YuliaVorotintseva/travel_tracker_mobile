@@ -3,6 +3,7 @@ import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+  KeyboardAvoidingView,
   Modal,
   Pressable,
   Text,
@@ -10,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetStyle } from "../../styles";
 
 interface Props {
@@ -67,7 +67,7 @@ export const EditActivityModal = ({
           onPress={onClose}
         />
 
-        <SafeAreaView style={styles.sheet}>
+        <KeyboardAvoidingView style={styles.sheet}>
           <Text style={styles.title}>Редактирование активности</Text>
           <Text style={styles.coordText}>
             {`📍 ${activity.location.lat.toFixed(4)}, ${activity.location.lng.toFixed(4)}`}
@@ -168,7 +168,7 @@ export const EditActivityModal = ({
           >
             <Text style={styles.submitText}>Save changes</Text>
           </TouchableOpacity>
-        </SafeAreaView>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );
