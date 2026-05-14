@@ -8,7 +8,8 @@ import {
   View,
 } from "react-native";
 import { AvatarSource, useAvatarUpload } from "../../hooks";
-import { styles } from "./styles";
+import { useTheme } from "../../lib";
+import { getStyles } from "./styles";
 
 interface AvatarPickerProps {
   userId: string;
@@ -23,6 +24,8 @@ export const AvatarPicker = ({
 }: AvatarPickerProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { upload, isUploading, error } = useAvatarUpload(userId);
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
 
   const handleSourceSelect = async (source: AvatarSource) => {
     setModalVisible(false);

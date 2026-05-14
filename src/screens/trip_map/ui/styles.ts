@@ -67,6 +67,7 @@ export const useGetStyle = (theme: Theme) => {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
+      backgroundColor: Styles[theme].BgPrimary,
     },
     backBtn: {
       padding: 10,

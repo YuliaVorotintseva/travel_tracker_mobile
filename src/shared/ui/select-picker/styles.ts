@@ -78,7 +78,7 @@ export const useGetStyles = () => {
     optionIcon: { fontSize: 18 },
     optionText: {
       fontSize: 16,
-      color: Styles[theme].TextTertiary,
+      color: Styles[theme].TextPrimary,
     },
     optionTextSelected: {
       color: Styles[theme].TextAccent,

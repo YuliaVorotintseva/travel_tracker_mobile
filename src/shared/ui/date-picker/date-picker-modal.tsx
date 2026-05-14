@@ -3,7 +3,8 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import React, { useEffect, useState } from "react";
 import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
-import { styles } from "./styles";
+import { useTheme } from "../../lib";
+import { getStyles } from "./styles";
 
 interface DatePickerModalProps {
   visible: boolean;
@@ -23,6 +24,8 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
   maxDate,
 }) => {
   const [tempDate, setTempDate] = useState(new Date());
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
 
   useEffect(() => {
     if (visible) {
@@ -92,7 +95,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
     return (
       <DateTimePicker
         value={tempDate}
-        mode="date"
+        mode="datetime"
         display="default"
         onChange={handleChange}
         minimumDate={minDate}
