@@ -1,45 +1,75 @@
+import { useTheme } from "@/src/shared/lib";
+import { Styles } from "@/src/shared/styles";
 import { StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: "flex-end" },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  sheet: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
-    paddingBottom: 32,
-  },
-  title: { fontSize: 20, fontWeight: "700", marginBottom: 4, color: "#0F172A" },
-  coordText: { fontSize: 13, color: "#64748B", marginBottom: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 16,
-    backgroundColor: "#F8FAFC",
-    marginBottom: 12,
-  },
-  label: { fontSize: 14, fontWeight: "600", color: "#475569", marginBottom: 6 },
-  dateBtn: {
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    borderRadius: 12,
-    padding: 14,
-    backgroundColor: "#F8FAFC",
-    marginBottom: 12,
-  },
-  dateText: { fontSize: 16, color: "#334155" },
-  submitBtn: {
-    backgroundColor: "#2563EB",
-    borderRadius: 14,
-    padding: 16,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  submitText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-});
+export const useGetStyle = () => {
+  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
+
+  return StyleSheet.create({
+    overlay: { flex: 1, justifyContent: "flex-end" },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0,0,0,0.5)",
+    },
+    sheet: {
+      backgroundColor: Styles[theme].BgPrimary,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      padding: 20,
+      paddingBottom: insets.bottom + 20,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "700",
+      marginBottom: 4,
+      color: Styles[theme].TextPrimary,
+    },
+    coordText: {
+      fontSize: 13,
+      color: Styles[theme].TextTertiary,
+      marginBottom: 16,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: Styles[theme].BorderDefault,
+      borderRadius: 12,
+      padding: 14,
+      fontSize: 16,
+      backgroundColor: Styles[theme].BgSecondary,
+      color: Styles[theme].TextTertiary,
+      marginBottom: 12,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: Styles[theme].TextSecondary,
+      marginBottom: 6,
+    },
+    dateBtn: {
+      borderWidth: 1,
+      borderColor: Styles[theme].BorderDefault,
+      borderRadius: 12,
+      padding: 14,
+      backgroundColor: Styles[theme].BgSecondary,
+      marginBottom: 12,
+    },
+    dateText: {
+      fontSize: 16,
+      color: Styles[theme].TextSecondary,
+    },
+    submitBtn: {
+      backgroundColor: Styles[theme].IconAccent,
+      borderRadius: 14,
+      padding: 16,
+      alignItems: "center",
+      marginTop: 8,
+    },
+    submitText: {
+      color: Styles[theme].TextPrimary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  });
+};

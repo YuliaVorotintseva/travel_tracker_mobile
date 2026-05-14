@@ -29,6 +29,7 @@ export const getStyles = (theme: Theme) =>
       alignItems: "center",
     },
     moveToMapBtnText: {
+      color: Styles[theme].TextPrimary,
       fontSize: 16,
       fontWeight: 500,
     },

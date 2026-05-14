@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import { styles } from "./styles";
+import { useGetStyles } from "./styles";
 
 export interface SelectOption<T = string> {
   label: string;
@@ -38,6 +38,7 @@ export const SelectPicker = <T extends string | number>({
 }: SelectPickerProps<T>) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState("");
+  const styles = useGetStyles();
 
   const selectedOption = options.find((opt) => opt.value === value);
   const displayText = selectedOption ? selectedOption.label : placeholder;

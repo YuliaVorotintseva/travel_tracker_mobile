@@ -34,8 +34,12 @@ export const useGetStyles = (theme: Theme) => {
       marginBottom: 10,
     },
     title: {
+      color: Styles[theme].TextPrimary,
       fontSize: 16,
       fontWeight: 500,
+    },
+    info: {
+      color: Styles[theme].TextPrimary,
     },
   });
 };

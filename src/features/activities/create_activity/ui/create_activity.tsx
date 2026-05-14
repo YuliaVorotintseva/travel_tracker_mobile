@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { styles } from "../../styles";
+import { useGetStyle } from "../../styles";
 
 interface Props {
   visible: boolean;
@@ -33,6 +33,7 @@ export const CreateActivityModal = ({
   initialCoord,
 }: Props) => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+  const styles = useGetStyle();
   const {
     control,
     handleSubmit,

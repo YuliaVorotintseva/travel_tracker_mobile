@@ -131,6 +131,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
     try {
       await updateActivity(activityId, data);
       setIsEditActivityModalVisible(false);
+      setSelectedActivity(null);
     } catch (error: unknown) {
       console.error(error);
     }
@@ -179,6 +180,9 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
         initialRegion={initialRegion}
         onPress={handleMapPress}
         showsUserLocation={!!userLocation}
+        customMapStyle={
+          theme === "dark" ? require("@/src/shared/styles/map_style.json") : {}
+        }
       >
         {activities
           .filter((a) => a.location)
@@ -199,7 +203,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
           <Polyline
             // coordinates={roadPath || routePoints}
             coordinates={routePoints}
-            strokeColor={Styles[theme].BorderDisabled}
+            strokeColor={Styles[theme].BorderAccent}
             strokeWidth={1}
             lineCap="round"
             lineJoin="round"

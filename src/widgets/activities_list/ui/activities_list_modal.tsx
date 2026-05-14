@@ -40,13 +40,15 @@ export const ActivitiesListModal: FC<ActivitiesListModalProps> = ({
                     onPress={() => onPressActivity(item)}
                   >
                     <Text style={styles.title}>{item.title}</Text>
-                    <Text>{`Address: ${item.location.address}`}</Text>
-                    <Text>{item.notes}</Text>
-                    <Text>
+                    <Text
+                      style={styles.info}
+                    >{`Address: ${item.location.address}`}</Text>
+                    <Text style={styles.info}>{item.notes}</Text>
+                    <Text style={styles.info}>
                       {item.start_time &&
                         `Start time: ${getFormatDate(new Date(item.start_time))}`}
                     </Text>
-                    <Text>
+                    <Text style={styles.info}>
                       {item.start_time &&
                         item.end_time &&
                         `Start time: ${getFormatDate(new Date(item.end_time))}`}

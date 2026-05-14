@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { styles } from "../../styles";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useGetStyle } from "../../styles";
 
 interface Props {
   visible: boolean;
@@ -33,9 +34,9 @@ export const EditActivityModal = ({
   activity,
 }: Props) => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+  const styles = useGetStyle();
   const {
     control,
-    reset,
     handleSubmit,
     formState: { isDirty, isSubmitting },
   } = useForm<EditActivityFormData>({
@@ -48,15 +49,9 @@ export const EditActivityModal = ({
     mode: "onBlur",
   });
 
-  const handleSave = handleSubmit(async (input: EditActivityFormData) => {
-    onSubmit(activity.id, input);
-    reset({
-      title: input.title,
-      type: input.type,
-      start_time: input.start_time,
-      notes: input.notes,
-    });
-  });
+  const handleSave = handleSubmit(async (input: EditActivityFormData) =>
+    onSubmit(activity.id, input),
+  );
 
   return (
     <Modal
@@ -72,8 +67,8 @@ export const EditActivityModal = ({
           onPress={onClose}
         />
 
-        <View style={styles.sheet}>
-          <Text style={styles.title}>Добавить точку</Text>
+        <SafeAreaView style={styles.sheet}>
+          <Text style={styles.title}>Редактирование активности</Text>
           <Text style={styles.coordText}>
             {`📍 ${activity.location.lat.toFixed(4)}, ${activity.location.lng.toFixed(4)}`}
           </Text>
@@ -173,7 +168,7 @@ export const EditActivityModal = ({
           >
             <Text style={styles.submitText}>Save changes</Text>
           </TouchableOpacity>
-        </View>
+        </SafeAreaView>
       </View>
     </Modal>
   );

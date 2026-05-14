@@ -36,6 +36,9 @@ export const MapScreen = () => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
+        customMapStyle={
+          theme === "dark" ? require("@/src/shared/styles/map_style.json") : {}
+        }
       >
         <Marker
           coordinate={{
