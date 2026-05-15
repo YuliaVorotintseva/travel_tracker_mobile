@@ -12,11 +12,11 @@ import { EditActivityModal } from "@/src/features/activities/edit_activity/ui/ed
 import { useGetCurrentLocation } from "@/src/shared/hooks";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
-import { Activity } from "@/src/shared/types";
+import { Activity, TripMember } from "@/src/shared/types";
 import { Loader } from "@/src/shared/ui/loaders";
 import { ActivitiesListModal } from "@/src/widgets/activities_list/ui/activities_list_modal";
 import { Coordinate, fetchRoadRoute } from "../model/trip_map_actions";
-import { RouteBuilder } from "./rout_builder";
+import { RouteBuilder } from "./route_builder";
 import { useGetStyle } from "./styles";
 
 export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
@@ -42,7 +42,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   const [roadPath, setRoadPath] = useState<Coordinate[] | null>(null);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [showRouteBuilder, setShowRouteBuilder] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<TripMember["role"] | null>(null);
   const mapRef = useRef<MapView>(null);
   const { theme } = useTheme();
   const styles = useGetStyle(theme);
@@ -150,10 +150,11 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   ) => {
     try {
       await updateActivity(activityId, data);
-      setIsEditActivityModalVisible(false);
-      setSelectedActivity(null);
     } catch (error: unknown) {
       console.error(error);
+    } finally {
+      setIsEditActivityModalVisible(false);
+      setSelectedActivity(null);
     }
   };
 
@@ -303,27 +304,38 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
 
       <CreateActivityModal
         visible={isCreateActivityModalVisible}
-        onClose={() => setisCreateActivityModalVisible(false)}
+        onClose={() => {
+          setisCreateActivityModalVisible(false);
+          setSelectedActivity(null);
+          setSelectedCoord(null);
+        }}
         onSubmit={handleAddActivity}
         initialCoord={selectedCoord}
       />
 
       {showRouteBuilder && (
-        <View style={styles.modalOverlay}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowRouteBuilder(false)}
+        >
           <View style={styles.modalSheet}>
             <RouteBuilder
               tripId={tripId!}
-              userRole={userRole as any}
+              userRole={userRole}
               onClose={() => setShowRouteBuilder(false)}
             />
           </View>
-        </View>
+        </Pressable>
       )}
 
       {selectedActivity && (
         <EditActivityModal
           visible={isEditActivityModalVisible}
-          onClose={() => setIsEditActivityModalVisible(false)}
+          onClose={() => {
+            setIsEditActivityModalVisible(false);
+            setSelectedActivity(null);
+            setSelectedCoord(null);
+          }}
           onSubmit={handleEditActivity}
           onDelete={() => {
             deleteActivity(selectedActivity.id);
@@ -335,9 +347,12 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
 
       {isActivitiesListOpen && (
         <ActivitiesListModal
-          onPressOverlay={() => setIsActivitiesListOpen(false)}
-          onPressCloseIcon={() => setIsActivitiesListOpen(false)}
-          onPressActivity={(item: Activity) => {
+          onClose={() => {
+            setIsActivitiesListOpen(false);
+            setSelectedActivity(null);
+            setSelectedCoord(null);
+          }}
+          onActivity={(item: Activity) => {
             setSelectedActivity(item);
             setIsEditActivityModalVisible(true);
           }}

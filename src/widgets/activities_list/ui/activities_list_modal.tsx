@@ -10,26 +10,24 @@ import { getFormatDate } from "@/src/shared/utils";
 import { useGetStyles } from "./styles";
 
 type ActivitiesListModalProps = {
-  onPressOverlay: () => void;
-  onPressCloseIcon: () => void;
-  onPressActivity: (activity: Activity) => void;
+  onClose: () => void;
+  onActivity: (activity: Activity) => void;
   activities: Activity[];
 };
 
 export const ActivitiesListModal: FC<ActivitiesListModalProps> = ({
   activities,
-  onPressOverlay,
-  onPressActivity,
-  onPressCloseIcon,
+  onActivity,
+  onClose,
 }) => {
   const { theme } = useTheme();
   const styles = useGetStyles(theme);
 
   return (
     <View style={styles.modalOverlay}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={onPressOverlay} />
+      <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       <SafeAreaView style={styles.modalContent}>
-        <Pressable onPress={onPressCloseIcon}>
+        <Pressable onPress={onClose}>
           <CloseIcon />
         </Pressable>
         <View style={{ flex: 1 }}>
@@ -40,7 +38,7 @@ export const ActivitiesListModal: FC<ActivitiesListModalProps> = ({
                 renderItem={({ item }) => (
                   <Pressable
                     style={styles.activity}
-                    onPress={() => onPressActivity(item)}
+                    onPress={() => onActivity(item)}
                   >
                     <Text style={styles.title}>{item.title}</Text>
                     <Text

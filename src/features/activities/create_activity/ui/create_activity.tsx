@@ -2,6 +2,7 @@ import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { Activity, ACTIVITY_TYPES } from "@/src/shared/types";
 import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
+import { getFormatDate } from "@/src/shared/utils";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -40,20 +41,22 @@ export const CreateActivityModal = ({
   const styles = useGetStyle(theme);
   const {
     control,
+    reset,
     handleSubmit,
     formState: { isDirty, isSubmitting },
   } = useForm<CreateActivityFormData>({
     defaultValues: {
       title: "",
       type: "custom",
-      start_time: "--:--",
+      start_time: getFormatDate(new Date(Date.now())),
     },
     mode: "onBlur",
   });
 
-  const handleSave = handleSubmit(async (input: CreateActivityFormData) =>
-    onSubmit(input),
-  );
+  const handleSave = handleSubmit(async (input: CreateActivityFormData) => {
+    reset();
+    onSubmit(input);
+  });
 
   return (
     <Modal

@@ -1,5 +1,5 @@
 import { supabase } from "@/src/shared/lib";
-import { Activity } from "@/src/shared/types";
+import { Activity, TripMember } from "@/src/shared/types";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ import { useGetStyle } from "./styles";
 
 interface Props {
   tripId: string;
-  userRole: "owner" | "editor" | "viewer" | null;
+  userRole: TripMember["role"] | null;
   onClose: () => void;
 }
 
@@ -36,7 +36,7 @@ export const RouteBuilder = ({ tripId, userRole, onClose }: Props) => {
       <View style={styles.container}>
         <Text style={styles.title}>📍 Построение маршрута</Text>
         <Text style={styles.error}>
-          Только создатель или редактор может менять порядок
+          Только создатель или редактор может менять маршрут путешествия
         </Text>
         <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
           <Text style={styles.btnText}>Закрыть</Text>
@@ -53,20 +53,16 @@ export const RouteBuilder = ({ tripId, userRole, onClose }: Props) => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updates = route.map((act, index) => ({
-        id: act.id,
-        trip_id: tripId,
-        route_order: index + 1,
-      }));
+      const updates = route.map((act, index) =>
+        supabase
+          .from("activities")
+          .update({ route_order: index + 1 })
+          .eq("id", act.id),
+      );
 
-      const { error } = await supabase
-        .from("activities")
-        .upsert(updates, { onConflict: "id" });
-
-      if (error) throw error;
-
-      updates.forEach(({ id, route_order }) =>
-        updateActivity(id, { route_order }),
+      await Promise.all(updates);
+      route.forEach((act, index) =>
+        updateActivity(act.id, { route_order: index + 1 }),
       );
 
       onClose();
