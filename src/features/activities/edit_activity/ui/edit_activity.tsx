@@ -1,11 +1,15 @@
+import { useTheme } from "@/src/shared/lib";
+import { Styles } from "@/src/shared/styles";
 import { Activity, ACTIVITY_TYPES } from "@/src/shared/types";
 import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
+import { ConfirmDeleteModal } from "@/src/shared/ui/confirm_delete_modal";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   KeyboardAvoidingView,
   Modal,
   Pressable,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -17,6 +21,7 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   onSubmit: (activityId: string, data: Partial<Activity>) => void;
+  onDelete: () => void;
   activity: Activity;
 }
 
@@ -31,10 +36,14 @@ export const EditActivityModal = ({
   visible,
   onClose,
   onSubmit,
+  onDelete,
   activity,
 }: Props) => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
-  const styles = useGetStyle();
+  const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] =
+    useState(false);
+  const { theme } = useTheme();
+  const styles = useGetStyle(theme);
   const {
     control,
     handleSubmit,
@@ -162,13 +171,41 @@ export const EditActivityModal = ({
           />
 
           <TouchableOpacity
-            style={styles.submitBtn}
+            style={StyleSheet.compose(styles.controlBtn, {
+              backgroundColor:
+                !isDirty || isSubmitting
+                  ? Styles[theme].PrimaryDisabled
+                  : Styles[theme].IconAccent,
+            })}
             onPress={handleSave}
             disabled={!isDirty || isSubmitting}
           >
             <Text style={styles.submitText}>Save changes</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={StyleSheet.compose(styles.controlBtn, {
+              backgroundColor: isSubmitting
+                ? Styles[theme].PrimaryDisabled
+                : Styles[theme].NegativeUniversal,
+            })}
+            onPress={() => setIsConfirmDeleteModalOpen(true)}
+            disabled={isSubmitting}
+          >
+            <Text style={styles.submitText}>Delete activity</Text>
+          </TouchableOpacity>
         </KeyboardAvoidingView>
+
+        {isConfirmDeleteModalOpen && (
+          <ConfirmDeleteModal
+            onClose={() => setIsConfirmDeleteModalOpen(false)}
+            onDelete={() => {
+              onDelete();
+              onClose();
+            }}
+            text="Are you sure you want to delete this activity?"
+          />
+        )}
       </View>
     </Modal>
   );

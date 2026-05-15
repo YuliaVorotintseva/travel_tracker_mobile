@@ -1,4 +1,5 @@
 import { FlashList } from "@shopify/flash-list";
+import { useRouter } from "expo-router";
 import { FC, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -6,8 +7,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MyTripCard } from "@/src/entities/trips/my-trip-card/ui";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { CreateButton } from "@/src/shared/ui";
+import { ConfirmDeleteModal } from "@/src/shared/ui/confirm_delete_modal";
 import { Loader } from "@/src/shared/ui/loaders";
-import { useRouter } from "expo-router";
 import { useMyTripsStore } from "../model/my_trips_store";
 import { getStyles } from "./styles";
 
@@ -16,6 +17,9 @@ export const MyTripsScreen: FC = () => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] =
+    useState(false);
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const { trips: myTrips, loading, fetchTrips, removeTrip } = useMyTripsStore();
 
   useEffect(() => {
@@ -58,8 +62,8 @@ export const MyTripsScreen: FC = () => {
   }, [userId]);
 
   const handleDelete = async (tripId: string) => {
-    removeTrip(tripId);
     const { error } = await supabase.from("trips").delete().eq("id", tripId);
+    removeTrip(tripId);
 
     if (!!error) {
       console.error(error);
@@ -84,8 +88,11 @@ export const MyTripsScreen: FC = () => {
               data={myTrips}
               renderItem={({ item }) => (
                 <MyTripCard
-                  onDelete={() => handleDelete(item.id)}
                   onPress={() => router.push(`/edit-trip/${item.id}`)}
+                  onDelete={() => {
+                    setSelectedTripId(item.id);
+                    setIsConfirmDeleteModalOpen(true);
+                  }}
                   trip={item}
                 />
               )}
@@ -100,6 +107,17 @@ export const MyTripsScreen: FC = () => {
         )}
         <CreateButton href="/create-trip" />
       </View>
+
+      {isConfirmDeleteModalOpen && !!selectedTripId && (
+        <ConfirmDeleteModal
+          onClose={() => setIsConfirmDeleteModalOpen(false)}
+          onDelete={() => {
+            handleDelete(selectedTripId);
+            setIsConfirmDeleteModalOpen(false);
+          }}
+          text="Are you sure you want to delete this trip?"
+        />
+      )}
     </SafeAreaView>
   );
 };

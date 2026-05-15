@@ -50,6 +50,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
     fetchActivities,
     createActivity,
     updateActivity,
+    deleteActivity,
     clear,
   } = useActivitiesActions();
 
@@ -284,6 +285,10 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
           visible={isEditActivityModalVisible}
           onClose={() => setIsEditActivityModalVisible(false)}
           onSubmit={handleEditActivity}
+          onDelete={() => {
+            deleteActivity(selectedActivity.id);
+            setIsEditActivityModalVisible(false);
+          }}
           activity={selectedActivity}
         />
       )}

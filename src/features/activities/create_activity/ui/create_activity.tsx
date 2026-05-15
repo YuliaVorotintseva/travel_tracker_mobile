@@ -1,3 +1,5 @@
+import { useTheme } from "@/src/shared/lib";
+import { Styles } from "@/src/shared/styles";
 import { Activity, ACTIVITY_TYPES } from "@/src/shared/types";
 import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
 import { useState } from "react";
@@ -5,6 +7,7 @@ import { Controller, useForm } from "react-hook-form";
 import {
   Modal,
   Pressable,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -33,7 +36,8 @@ export const CreateActivityModal = ({
   initialCoord,
 }: Props) => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
-  const styles = useGetStyle();
+  const { theme } = useTheme();
+  const styles = useGetStyle(theme);
   const {
     control,
     handleSubmit,
@@ -163,7 +167,12 @@ export const CreateActivityModal = ({
           />
 
           <TouchableOpacity
-            style={styles.submitBtn}
+            style={StyleSheet.compose(styles.controlBtn, {
+              backgroundColor:
+                !isDirty || isSubmitting
+                  ? Styles[theme].PrimaryDisabled
+                  : Styles[theme].IconAccent,
+            })}
             onPress={handleSave}
             disabled={!isDirty || isSubmitting}
           >

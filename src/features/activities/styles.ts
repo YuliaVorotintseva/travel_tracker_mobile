@@ -1,11 +1,10 @@
-import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
+import { Theme } from "@/src/shared/types";
 import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export const useGetStyle = () => {
+export const useGetStyle = (theme: Theme) => {
   const insets = useSafeAreaInsets();
-  const { theme } = useTheme();
 
   return StyleSheet.create({
     overlay: { flex: 1, justifyContent: "flex-end" },
@@ -58,8 +57,7 @@ export const useGetStyle = () => {
       fontSize: 16,
       color: Styles[theme].TextSecondary,
     },
-    submitBtn: {
-      backgroundColor: Styles[theme].IconAccent,
+    controlBtn: {
       borderRadius: 14,
       padding: 16,
       alignItems: "center",

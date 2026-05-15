@@ -2,8 +2,8 @@ import { FC } from "react";
 import { Pressable, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 
+import { TrashIcon } from "@/src/shared/icons";
 import { TripWithMembers } from "@/src/shared/types";
-import { DeleteButton } from "@/src/shared/ui";
 import { TripCard } from "../../trip-card/ui/trip-card";
 
 type MyTripCardProps = {
@@ -20,7 +20,16 @@ export const MyTripCard: FC<MyTripCardProps> = ({
   <Swipeable
     renderRightActions={() => (
       <View style={{ width: 80 }}>
-        <DeleteButton onPress={onDelete} />
+        <Pressable
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+          onPress={onDelete}
+        >
+          <TrashIcon />
+        </Pressable>
       </View>
     )}
     overshootRight={false}
