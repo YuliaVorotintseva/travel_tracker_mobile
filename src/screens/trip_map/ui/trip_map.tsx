@@ -10,12 +10,13 @@ import {
 } from "@/src/features/activities/create_activity";
 import { EditActivityModal } from "@/src/features/activities/edit_activity/ui/edit_activity";
 import { useGetCurrentLocation } from "@/src/shared/hooks";
-import { useTheme } from "@/src/shared/lib";
+import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { Activity } from "@/src/shared/types";
 import { Loader } from "@/src/shared/ui/loaders";
 import { ActivitiesListModal } from "@/src/widgets/activities_list/ui/activities_list_modal";
 import { Coordinate, fetchRoadRoute } from "../model/trip_map_actions";
+import { RouteBuilder } from "./rout_builder";
 import { useGetStyle } from "./styles";
 
 export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
@@ -40,6 +41,8 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   );
   const [roadPath, setRoadPath] = useState<Coordinate[] | null>(null);
   const [loadingRoute, setLoadingRoute] = useState(false);
+  const [showRouteBuilder, setShowRouteBuilder] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const mapRef = useRef<MapView>(null);
   const { theme } = useTheme();
   const styles = useGetStyle(theme);
@@ -61,7 +64,23 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   useEffect(() => {
     if (!tripId) return;
 
-    fetchActivities(tripId);
+    (async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const currentUserId = session?.user.id || null;
+
+      await Promise.all([
+        fetchActivities(tripId),
+        supabase
+          .from("trip_members")
+          .select("role")
+          .eq("trip_id", tripId)
+          .eq("user_id", currentUserId)
+          .single()
+          .then((data) => setUserRole(data.data?.role)),
+      ]);
+    })();
 
     return () => clear();
   }, [tripId]);
@@ -231,11 +250,20 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
           <Text style={styles.btnText}>Back to my trips</Text>
         </Pressable>
+
         <Pressable
           style={styles.activityListBtn}
           onPress={() => setIsActivitiesListOpen(true)}
         >
           <Text style={styles.btnText}>Activities list</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.routeBuilderBtn}
+          onPress={() => setShowRouteBuilder(true)}
+        >
+          <MaterialIcons name="route" size={20} color="#fff" />
+          <Text style={styles.btnText}>Построить маршрут</Text>
         </Pressable>
       </View>
 
@@ -279,6 +307,18 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
         onSubmit={handleAddActivity}
         initialCoord={selectedCoord}
       />
+
+      {showRouteBuilder && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <RouteBuilder
+              tripId={tripId!}
+              userRole={userRole as any}
+              onClose={() => setShowRouteBuilder(false)}
+            />
+          </View>
+        </View>
+      )}
 
       {selectedActivity && (
         <EditActivityModal

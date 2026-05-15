@@ -95,7 +95,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
     return (
       <DateTimePicker
         value={tempDate}
-        mode="datetime"
+        mode="date"
         display="default"
         onChange={handleChange}
         minimumDate={minDate}

@@ -69,10 +69,11 @@ export const useActivitiesActions = () => {
     return activities
       .filter((a) => a.location?.lat && a.location?.lng)
       .sort((a, b) => {
-        if (!a.start_time && !b.start_time) return 0;
-        if (!a.start_time) return 1;
-        if (!b.start_time) return -1;
-        return a.start_time.localeCompare(b.start_time);
+        if (a.route_order != null && b.route_order != null)
+          return a.route_order - b.route_order;
+        if (a.route_order != null) return -1;
+        if (b.route_order != null) return 1;
+        return (a.start_time || "").localeCompare(b.start_time || "");
       })
       .map((a) => ({ latitude: a.location!.lat, longitude: a.location!.lng }));
   }, [activities]);
