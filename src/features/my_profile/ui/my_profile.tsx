@@ -1,11 +1,12 @@
+import { User } from "@supabase/supabase-js";
+import { FC, useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+
 import { CloseIcon } from "@/src/shared/icons";
-import { supabase, useTheme } from "@/src/shared/lib";
+import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { IconBackButton } from "@/src/shared/ui";
 import { AvatarPicker } from "@/src/shared/ui/avatar-picker/avatar-picker";
-import { User } from "@supabase/supabase-js";
-import { FC, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -22,13 +23,14 @@ import {
   ProfileFormData,
   ProfileFormResolver,
 } from "../lib/form-resolver";
+import { useMyProfileStore } from "../model";
 import { getStyles } from "./styles";
 
 export const MyProfile: FC = () => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { myData, error, fetchMyData, updateMyData, clear } =
+    useMyProfileStore();
   const {
     control,
     reset,
@@ -41,43 +43,27 @@ export const MyProfile: FC = () => {
   });
 
   useEffect(() => {
-    supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        setUser(session?.user ?? null);
-      })
-      .catch((error: unknown) => {
-        setError((error as { message: string }).message);
-        console.error((error as { message: string }).message);
-      });
+    fetchMyData();
+    return () => clear();
   }, []);
 
   useEffect(() => {
     reset({
-      full_name: !!user?.user_metadata ? user?.user_metadata["full_name"] : "",
-      email: !!user ? user?.email : "",
+      full_name: !!myData?.user_metadata
+        ? myData?.user_metadata["full_name"]
+        : "",
+      email: !!myData ? myData?.email : "",
     });
-  }, [user]);
+  }, [myData]);
 
   const onSubmit = handleSubmit(
     async (input: { full_name: string; email: string }) => {
       const editedData = {
-        id: user?.id,
+        ...myData,
         ...input,
-      };
+      } as User;
 
-      const { data: updatedProfile, error } = await supabase
-        .from("profiles")
-        .update(editedData)
-        .eq("id", user?.id)
-        .select()
-        .single();
-
-      if (!!error) {
-        throw error;
-      }
-
-      setUser(updatedProfile);
+      updateMyData(editedData);
       console.log("User was successfuly updated!");
     },
   );
@@ -125,9 +111,10 @@ export const MyProfile: FC = () => {
             <View style={styles.formInputs}>
               <View style={styles.uploadImgArea}>
                 <AvatarPicker
-                  userId={user?.id!}
+                  userId={myData?.id!}
                   currentAvatarUrl={
-                    !!user?.user_metadata && user?.user_metadata["avatar_url"]
+                    !!myData?.user_metadata &&
+                    myData?.user_metadata["avatar_url"]
                   }
                 />
               </View>

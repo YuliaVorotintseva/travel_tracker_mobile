@@ -1,11 +1,11 @@
 import { useRouter } from "expo-router";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { Image, Pressable, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useMyProfileStore } from "@/src/features/my_profile";
 import { DarkThemeIcon, LightThemeIcon, LogOutIcon } from "@/src/shared/icons";
 import { supabase, useAuth, useTheme } from "@/src/shared/lib";
-import { User } from "@supabase/supabase-js";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { getStyles } from "./styles";
 
 export const Settings: FC = () => {
@@ -13,40 +13,18 @@ export const Settings: FC = () => {
   const { logout } = useAuth();
   const { toggleTheme, theme } = useTheme();
   const styles = getStyles(theme);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { myData, loading, fetchMyData, updateMyData } = useMyProfileStore();
 
   useEffect(() => {
-    let isMounted = true;
-
-    supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        if (isMounted) {
-          setUser(session?.user ?? null);
-        }
-      })
-      .catch((error: unknown) => {
-        console.error((error as { message: string }).message);
-      })
-      .finally(() => {
-        if (isMounted) {
-          setLoading(false);
-        }
-      });
+    fetchMyData();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (isMounted) {
-        setUser(session?.user ?? null);
-      }
+      updateMyData(session?.user!);
     });
 
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
@@ -61,9 +39,9 @@ export const Settings: FC = () => {
           {!loading && (
             <View style={styles.userInfo}>
               <Pressable onPress={() => router.push("/users/my_profile")}>
-                {!!user?.user_metadata["avatar_url"] ? (
+                {!!myData?.user_metadata["avatar_url"] ? (
                   <Image
-                    source={{ uri: user.user_metadata["avatar_url"] }}
+                    source={{ uri: myData.user_metadata["avatar_url"] }}
                     style={styles.avatar}
                   />
                 ) : (
@@ -75,8 +53,8 @@ export const Settings: FC = () => {
               </Pressable>
               <View>
                 <Text style={styles.optionText}>
-                  {user?.user_metadata["full_name"]
-                    ? user?.user_metadata["full_name"]
+                  {myData?.user_metadata["full_name"]
+                    ? myData?.user_metadata["full_name"]
                     : "unknown"}
                 </Text>
               </View>
