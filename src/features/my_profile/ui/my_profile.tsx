@@ -1,4 +1,3 @@
-import { User } from "@supabase/supabase-js";
 import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -49,24 +48,21 @@ export const MyProfile: FC = () => {
 
   useEffect(() => {
     reset({
-      full_name: !!myData?.user_metadata
-        ? myData?.user_metadata["full_name"]
-        : "",
+      full_name: !!myData ? myData?.full_name : "",
       email: !!myData ? myData?.email : "",
     });
   }, [myData]);
 
-  const onSubmit = handleSubmit(
-    async (input: { full_name: string; email: string }) => {
-      const editedData = {
-        ...myData,
-        ...input,
-      } as User;
+  const onSubmit = handleSubmit(async (input: ProfileFormData) => {
+    if (!myData) return;
 
-      updateMyData(editedData);
-      console.log("User was successfuly updated!");
-    },
-  );
+    const editedData = {
+      ...myData,
+      ...input,
+    };
+
+    updateMyData(editedData);
+  });
 
   return (
     <KeyboardAvoidingView
@@ -112,10 +108,7 @@ export const MyProfile: FC = () => {
               <View style={styles.uploadImgArea}>
                 <AvatarPicker
                   userId={myData?.id!}
-                  currentAvatarUrl={
-                    !!myData?.user_metadata &&
-                    myData?.user_metadata["avatar_url"]
-                  }
+                  currentAvatarUrl={myData?.avatar_url}
                 />
               </View>
 

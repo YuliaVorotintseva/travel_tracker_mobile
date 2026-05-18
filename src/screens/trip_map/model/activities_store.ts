@@ -12,7 +12,7 @@ interface ActivityState {
   loading: boolean;
   error: string | null;
   fetchActivities: (tripId: string) => Promise<void>;
-  addActivity: (activity: Activity) => void;
+  addActivity: (tripId: string, activity: Activity) => void;
   updateActivity: (id: string, data: Partial<Activity>) => void;
   removeActivity: (id: string) => void;
   clear: () => void;
@@ -46,20 +46,77 @@ export const useActivityStore = create<ActivityState>()(
         }
       },
 
-      addActivity: (activity) =>
-        set((state) => ({ activities: [...state.activities, activity] })),
-
-      updateActivity: (id, data) =>
+      addActivity: async (tripId, activity) => {
+        const tempId = `temp_${Date.now()}`;
         set((state) => ({
+          error: null,
+          activities: [...state.activities, { ...activity, id: tempId }],
+        }));
+
+        try {
+          const { data: newActivity, error } = await supabase
+            .from("activities")
+            .insert({ trip_id: tripId, ...activity })
+            .select()
+            .single();
+
+          if (!!error) {
+            throw error;
+          }
+
+          set((state) => ({ activities: [...state.activities, newActivity] }));
+        } catch (error: unknown) {
+          set({ error: (error as { message: string }).message });
+        } finally {
+          set((state) => ({
+            activities: state.activities.filter((a) => a.id !== tempId),
+          }));
+        }
+      },
+
+      updateActivity: async (id, data) => {
+        set((state) => ({
+          error: null,
           activities: state.activities.map((a) =>
             a.id === id ? { ...a, ...data } : a,
           ),
-        })),
+        }));
 
-      removeActivity: (id) =>
+        try {
+          const { error } = await supabase
+            .from("activities")
+            .update({ id, ...data })
+            .eq("id", id)
+            .select()
+            .single();
+
+          if (!!error) {
+            throw error;
+          }
+        } catch (error: unknown) {
+          set({ error: (error as { message: string }).message });
+        }
+      },
+
+      removeActivity: async (id) => {
         set((state) => ({
+          error: null,
           activities: state.activities.filter((a) => a.id !== id),
-        })),
+        }));
+
+        try {
+          const { error } = await supabase
+            .from("activities")
+            .delete()
+            .eq("id", id);
+
+          if (!!error) {
+            throw error;
+          }
+        } catch (error: unknown) {
+          set({ error: (error as { message: string }).message });
+        }
+      },
 
       clear: () => set({ activities: [], tripId: null, error: null }),
     }),

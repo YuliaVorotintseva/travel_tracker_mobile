@@ -4,10 +4,7 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import MapView, { Marker, Polyline, Region } from "react-native-maps";
 
-import {
-  CreateActivityModal,
-  useActivitiesActions,
-} from "@/src/features/activities/create_activity";
+import { CreateActivityModal } from "@/src/features/activities/create_activity";
 import { EditActivityModal } from "@/src/features/activities/edit_activity/ui/edit_activity";
 import { useGetCurrentLocation } from "@/src/shared/hooks";
 import { supabase, useTheme } from "@/src/shared/lib";
@@ -15,6 +12,7 @@ import { Styles } from "@/src/shared/styles";
 import { Activity, TripMember } from "@/src/shared/types";
 import { Loader } from "@/src/shared/ui/loaders";
 import { ActivitiesListModal } from "@/src/widgets/activities_list/ui/activities_list_modal";
+import { useActivityStore } from "../model";
 import { Coordinate, fetchRoadRoute } from "../model/trip_map_actions";
 import { RouteBuilder } from "./route_builder";
 import { useGetStyle } from "./styles";
@@ -48,14 +46,13 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   const styles = useGetStyle(theme);
   const {
     activities,
-    loadingActivities,
-    routePoints,
+    loading: loadingActivities,
     fetchActivities,
-    createActivity,
+    addActivity,
     updateActivity,
-    deleteActivity,
+    removeActivity,
     clear,
-  } = useActivitiesActions();
+  } = useActivityStore();
 
   useEffect(() => {
     fetchLocation();
@@ -84,6 +81,19 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
 
     return () => clear();
   }, [tripId]);
+
+  const routePoints = useMemo(() => {
+    return activities
+      .filter((a) => a.location?.lat && a.location?.lng)
+      .sort((a, b) => {
+        if (a.route_order != null && b.route_order != null)
+          return a.route_order - b.route_order;
+        if (a.route_order != null) return -1;
+        if (b.route_order != null) return 1;
+        return (a.start_time || "").localeCompare(b.start_time || "");
+      })
+      .map((a) => ({ latitude: a.location!.lat, longitude: a.location!.lng }));
+  }, [activities]);
 
   useEffect(() => {
     if (routePoints.length < 2) {
@@ -133,10 +143,10 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   const handleAddActivity = async (data: Partial<Activity>) => {
     if (!tripId || !selectedCoord) return;
     try {
-      await createActivity(tripId, {
+      await addActivity(tripId, {
         ...data,
         location: { lat: selectedCoord.latitude, lng: selectedCoord.longitude },
-      });
+      } as Activity);
       setisCreateActivityModalVisible(false);
       setSelectedCoord(null);
     } catch (error: unknown) {
@@ -186,11 +196,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
     loadingRoute ||
     !userLocation
   ) {
-    return (
-      <View style={styles.loading}>
-        <Loader />
-      </View>
-    );
+    return <Loader />;
   }
 
   return (
@@ -338,7 +344,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
           }}
           onSubmit={handleEditActivity}
           onDelete={() => {
-            deleteActivity(selectedActivity.id);
+            removeActivity(selectedActivity.id);
             setIsEditActivityModalVisible(false);
           }}
           activity={selectedActivity}

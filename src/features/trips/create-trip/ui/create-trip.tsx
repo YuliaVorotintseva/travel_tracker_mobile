@@ -11,9 +11,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useMyProfileStore } from "@/src/features/my_profile";
 import { useMyTripsStore } from "@/src/screens/trips/model/my_trips_store";
 import { BackIcon } from "@/src/shared/icons";
-import { supabase, useTheme } from "@/src/shared/lib";
+import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { CURRENCIES, Currency } from "@/src/shared/types";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
@@ -34,8 +35,6 @@ export const CreateTrip: FC = () => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
   const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
   const [startDate, setStartDate] = useState<string | null>(null);
@@ -57,48 +56,27 @@ export const CreateTrip: FC = () => {
     mode: "onBlur",
   });
   const { addTrip } = useMyTripsStore();
+  const { myData, error, fetchMyData, clear } = useMyProfileStore();
 
   useEffect(() => {
-    supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        setUserId(session?.user.id ?? null);
-      })
-      .catch((error: unknown) => {
-        console.error((error as { message: string }).message);
-      });
+    fetchMyData();
+    return () => clear();
   }, []);
 
   const onSubmit = handleSubmit(async (input: CreateTripData) => {
-    try {
-      if (!userId) {
-        return;
-      }
-
-      const newTripData = {
-        ...input,
-        created_by: userId,
-      };
-
-      const tempId = `temp_id_${Date.now().toString()}`;
-      addTrip({ id: tempId, ...newTripData });
-
-      const { data, error } = await supabase
-        .from("trips")
-        .insert(newTripData)
-        .select()
-        .single();
-      console.log("NEW TRIP: ", data);
-
-      if (!!error) {
-        console.error((error as { message: string }).message);
-      }
-
-      router.back();
-    } catch (error: unknown) {
-      setError((error as { message: string }).message);
-      console.error(JSON.stringify(error, null, 2));
+    if (!myData) {
+      return;
     }
+
+    const tempId = `temp_${Date.now()}`;
+    const newTripData = {
+      ...input,
+      created_by: myData.id,
+      id: tempId,
+    };
+
+    addTrip(tempId, newTripData);
+    router.back();
   });
 
   return (

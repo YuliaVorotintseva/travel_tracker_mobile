@@ -5,6 +5,7 @@ import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MyTripCard } from "@/src/entities/trips/my-trip-card/ui";
+import { useMyProfileStore } from "@/src/features/my_profile";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { CreateButton } from "@/src/shared/ui";
 import { ConfirmDeleteModal } from "@/src/shared/ui/confirm_delete_modal";
@@ -16,30 +17,29 @@ export const MyTripsScreen: FC = () => {
   const router = useRouter();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const [userId, setUserId] = useState<string | null>(null);
   const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] =
     useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
-  const { trips: myTrips, loading, fetchTrips, removeTrip } = useMyTripsStore();
+  const {
+    trips: myTrips,
+    loading,
+    fetchTrips,
+    removeTrip,
+    clear: clearTrips,
+  } = useMyTripsStore();
+  const { myData, fetchMyData, clear: clearMyData } = useMyProfileStore();
 
   useEffect(() => {
-    supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        setUserId(session?.user.id ?? null);
-      })
-      .catch((error: unknown) => {
-        console.error((error as { message: string }).message);
-      });
+    fetchMyData();
+    return () => clearMyData();
   }, []);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!myData?.id) return;
 
-    let isMounted = true;
-    const channel = supabase.channel(`trips-sync-${userId}`);
+    const channel = supabase.channel(`trips-sync-${myData.id}`);
 
-    fetchTrips(userId);
+    fetchTrips(myData.id);
 
     const tables = ["trips", "trip_members"] as const;
 
@@ -47,7 +47,7 @@ export const MyTripsScreen: FC = () => {
       channel.on(
         "postgres_changes",
         { event: "*", schema: "public", table },
-        () => fetchTrips(userId),
+        () => fetchTrips(myData.id),
       );
     });
 
@@ -56,10 +56,10 @@ export const MyTripsScreen: FC = () => {
     });
 
     return () => {
-      isMounted = false;
       channel.unsubscribe();
+      clearTrips();
     };
-  }, [userId]);
+  }, [myData]);
 
   const handleDelete = async (tripId: string) => {
     const { error } = await supabase.from("trips").delete().eq("id", tripId);
@@ -72,11 +72,7 @@ export const MyTripsScreen: FC = () => {
   };
 
   if (loading) {
-    return (
-      <View style={styles.loader}>
-        <Loader />
-      </View>
-    );
+    return <Loader />;
   }
 
   return (

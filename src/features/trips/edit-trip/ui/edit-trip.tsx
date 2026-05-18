@@ -3,9 +3,10 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useMyProfileStore } from "@/src/features/my_profile";
 import { useMyTripsStore } from "@/src/screens/trips/model/my_trips_store";
 import { BackIcon } from "@/src/shared/icons";
-import { supabase, useTheme } from "@/src/shared/lib";
+import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { CURRENCIES, Currency, TripWithMembers } from "@/src/shared/types";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
@@ -30,7 +31,13 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   const [error, setError] = useState<string | null>(null);
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
   const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
-  const { trips, updateTrip } = useMyTripsStore();
+  const {
+    trips,
+    fetchTrips,
+    updateTrip,
+    clear: clearTrips,
+  } = useMyTripsStore();
+  const { myData, fetchMyData, clear: clearMyData } = useMyProfileStore();
   const {
     control,
     reset,
@@ -49,10 +56,19 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   });
 
   useEffect(() => {
+    fetchMyData();
+    return () => clearMyData();
+  }, []);
+
+  useEffect(() => {
+    if (!myData) return;
+
+    fetchTrips(myData?.id);
     const trip = trips.find((t) => t.id === tripId);
     setTrip(trip ?? null);
-    console.log(trip);
-  }, []);
+
+    return () => clearTrips();
+  }, [myData]);
 
   useEffect(() => {
     if (trip) {
@@ -74,21 +90,8 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
         ...input,
       };
 
-      updateTrip(tripId, editedData);
-
-      const { data: updatedTrip, error } = await supabase
-        .from("trips")
-        .update(editedData)
-        .eq("id", tripId)
-        .select()
-        .single();
-
-      if (!!error) {
-        throw error;
-      }
-
+      const updatedTrip = await updateTrip(tripId, editedData);
       setTrip(updatedTrip);
-      console.log("Trip was successful updated!");
       router.back();
     } catch (error: unknown) {
       setError((error as { message: string }).message);

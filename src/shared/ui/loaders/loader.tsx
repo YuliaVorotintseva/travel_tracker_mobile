@@ -1,5 +1,5 @@
 import React, { memo, useEffect } from "react";
-import { StyleSheet, View, ViewStyle } from "react-native";
+import { View, ViewStyle } from "react-native";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -9,8 +9,10 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
+
 import { useTheme } from "../../lib";
 import { Styles } from "../../styles";
+import { getStyles } from "./styles";
 
 type InfiniteDotLoaderProps = {
   dotSize?: number;
@@ -82,6 +84,7 @@ export const Loader = ({
   containerStyle,
 }: InfiniteDotLoaderProps) => {
   const { theme } = useTheme();
+  const styles = getStyles(theme);
   const stagger = staggerDelay ?? speed / dotCount;
 
   return (
@@ -100,20 +103,3 @@ export const Loader = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: 50,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-});

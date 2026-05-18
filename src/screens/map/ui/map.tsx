@@ -19,11 +19,7 @@ export const MapScreen = () => {
   }, []);
 
   if (loading) {
-    return (
-      <View style={styles.loading}>
-        <Loader />
-      </View>
-    );
+    return <Loader />;
   }
 
   return (

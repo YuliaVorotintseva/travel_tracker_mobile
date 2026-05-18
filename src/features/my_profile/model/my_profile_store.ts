@@ -1,16 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { supabase } from "@/src/shared/lib";
+import { Profiles } from "@/src/shared/types/api/generated";
 
 interface MyProfileState {
-  myData: User | null;
+  myData: Profiles | null;
   loading: boolean;
   error: string | null;
   fetchMyData: () => void;
-  updateMyData: (data: User) => void;
+  updateMyData: (data: Profiles) => void;
   clear: () => void;
 }
 
@@ -24,13 +24,22 @@ export const useMyProfileStore = create<MyProfileState>()(
       fetchMyData: async () => {
         set({ loading: true, error: null });
         try {
-          const { data, error } = await supabase.auth.getSession();
+          const {
+            data: { session },
+            error: authError,
+          } = await supabase.auth.getSession();
 
-          if (!!error) {
-            throw error;
+          const { data: myProfile, error: getProfileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session?.user.id)
+            .maybeSingle();
+
+          if (!!authError || !!getProfileError) {
+            throw authError ?? getProfileError;
           }
 
-          set({ myData: data.session?.user, error });
+          set({ myData: myProfile });
         } catch (error: unknown) {
           set({ error: (error as { message: string }).message });
         } finally {
@@ -38,13 +47,18 @@ export const useMyProfileStore = create<MyProfileState>()(
         }
       },
 
-      updateMyData: async (updatedData: User) => {
-        set({ loading: true, error: null });
+      updateMyData: async (updatedData: Profiles) => {
+        set((state) => ({
+          myData: { ...state.myData, ...updatedData },
+          error: null,
+        }));
 
         try {
-          const { data, error } = await supabase
+          const { error } = await supabase
             .from("profiles")
-            .update(updatedData)
+            .update({
+              full_name: updatedData.full_name,
+            })
             .eq("id", updatedData.id)
             .select()
             .single();
@@ -52,12 +66,9 @@ export const useMyProfileStore = create<MyProfileState>()(
           if (!!error) {
             throw error;
           }
-
-          set({ myData: data.session?.user, error });
         } catch (error: unknown) {
           set({ error: (error as { message: string }).message });
-        } finally {
-          set({ loading: false });
+          console.error(error);
         }
       },
 

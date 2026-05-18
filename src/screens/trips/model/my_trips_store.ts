@@ -11,8 +11,11 @@ interface TripState {
   loading: boolean;
   error: string | null;
   fetchTrips: (userId: string) => Promise<void>;
-  addTrip: (trip: TripWithMembers) => void;
-  updateTrip: (id: string, data: Partial<TripWithMembers>) => void;
+  addTrip: (tempId: string, trip: TripWithMembers) => void;
+  updateTrip: (
+    id: string,
+    data: Partial<TripWithMembers>,
+  ) => Promise<TripWithMembers>;
   removeTrip: (id: string) => void;
   clear: () => void;
 }
@@ -60,26 +63,81 @@ export const useMyTripsStore = create<TripState>()(
 
           set({ trips: uniqueTrips || [] });
         } catch (error: unknown) {
-          console.error(
-            "Unexpected error: ",
-            (error as { message: string }).message,
-          );
+          set({ error: (error as { message: string }).message });
         } finally {
           set({ loading: false });
         }
       },
 
-      addTrip: (trip) => set((state) => ({ trips: [...state.trips, trip] })),
+      addTrip: async (tempId, trip) => {
+        set((state) => ({
+          trips: [...state.trips, trip],
+        }));
 
-      updateTrip: (id, data) =>
+        try {
+          const { data: newTrip, error } = await supabase
+            .from("trips")
+            .insert(trip)
+            .select()
+            .single();
+
+          if (!!error) {
+            throw error;
+          }
+
+          set((state) => ({ trips: [...state.trips, { ...newTrip }] }));
+        } catch (error: unknown) {
+          set({ error: (error as { message: string }).message });
+        } finally {
+          set((state) => ({
+            trips: state.trips.filter((t) => t.id !== tempId),
+          }));
+        }
+      },
+
+      updateTrip: async (id, data) => {
         set((state) => ({
           trips: state.trips.map((t) => (t.id === id ? { ...t, ...data } : t)),
-        })),
+        }));
 
-      removeTrip: (id) =>
+        try {
+          const { data: updatedData, error } = await supabase
+            .from("trips")
+            .update(data)
+            .eq("id", id)
+            .select()
+            .single();
+
+          if (!!error) {
+            throw error;
+          }
+
+          return updatedData;
+        } catch (error: unknown) {
+          set({ error: (error as { message: string }).message });
+          return null;
+        }
+      },
+
+      removeTrip: async (id) => {
         set((state) => ({
+          loading: true,
+          error: null,
           trips: state.trips.filter((t) => t.id !== id),
-        })),
+        }));
+
+        try {
+          const { error } = await supabase.from("trips").delete().eq("id", id);
+
+          if (!!error) {
+            throw error;
+          }
+        } catch (error: unknown) {
+          set({ error: (error as { message: string }).message });
+        } finally {
+          set({ loading: false });
+        }
+      },
 
       clear: () => set({ trips: [], userId: null, error: null }),
     }),

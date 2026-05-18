@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useMyProfileStore } from "@/src/features/my_profile";
 import { DarkThemeIcon, LightThemeIcon, LogOutIcon } from "@/src/shared/icons";
 import { supabase, useAuth, useTheme } from "@/src/shared/lib";
+import { Profiles } from "@/src/shared/types/api/generated";
 import { getStyles } from "./styles";
 
 export const Settings: FC = () => {
@@ -13,7 +14,8 @@ export const Settings: FC = () => {
   const { logout } = useAuth();
   const { toggleTheme, theme } = useTheme();
   const styles = getStyles(theme);
-  const { myData, loading, fetchMyData, updateMyData } = useMyProfileStore();
+  const { myData, loading, fetchMyData, updateMyData, clear } =
+    useMyProfileStore();
 
   useEffect(() => {
     fetchMyData();
@@ -21,10 +23,13 @@ export const Settings: FC = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      updateMyData(session?.user!);
+      updateMyData(session?.user! as Profiles);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clear();
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -39,9 +44,9 @@ export const Settings: FC = () => {
           {!loading && (
             <View style={styles.userInfo}>
               <Pressable onPress={() => router.push("/users/my_profile")}>
-                {!!myData?.user_metadata["avatar_url"] ? (
+                {!!myData?.avatar_url ? (
                   <Image
-                    source={{ uri: myData.user_metadata["avatar_url"] }}
+                    source={{ uri: myData.avatar_url }}
                     style={styles.avatar}
                   />
                 ) : (
@@ -53,9 +58,7 @@ export const Settings: FC = () => {
               </Pressable>
               <View>
                 <Text style={styles.optionText}>
-                  {myData?.user_metadata["full_name"]
-                    ? myData?.user_metadata["full_name"]
-                    : "unknown"}
+                  {myData?.full_name ? myData?.full_name : "unknown"}
                 </Text>
               </View>
             </View>
