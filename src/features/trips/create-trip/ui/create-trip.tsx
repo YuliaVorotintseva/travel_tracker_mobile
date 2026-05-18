@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Keyboard,
@@ -11,12 +11,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useMyProfileStore } from "@/src/features/my_profile";
-import { useMyTripsStore } from "@/src/screens/trips/model/my_trips_store";
+import { useMyProfile, useMyTrips } from "@/src/shared/hooks";
 import { BackIcon } from "@/src/shared/icons";
 import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { CURRENCIES, Currency } from "@/src/shared/types";
+import { Profiles } from "@/src/shared/types/api/generated";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
 import { getFormatDate } from "@/src/shared/utils";
 import { useRouter } from "expo-router";
@@ -55,28 +55,27 @@ export const CreateTrip: FC = () => {
     },
     mode: "onBlur",
   });
-  const { addTrip } = useMyTripsStore();
-  const { myData, error, fetchMyData, clear } = useMyProfileStore();
-
-  useEffect(() => {
-    fetchMyData();
-    return () => clear();
-  }, []);
+  const { profile, error } = useMyProfile();
+  const { addTrip } = useMyTrips((profile as Profiles).id);
 
   const onSubmit = handleSubmit(async (input: CreateTripData) => {
-    if (!myData) {
+    if (!profile) {
       return;
     }
 
     const tempId = `temp_${Date.now()}`;
     const newTripData = {
       ...input,
-      created_by: myData.id,
+      created_by: profile.id,
       id: tempId,
     };
 
-    addTrip(tempId, newTripData);
-    router.back();
+    try {
+      await addTrip(newTripData);
+      router.back();
+    } catch (error: unknown) {
+      console.error((error as { message: string }).message);
+    }
   });
 
   return (
@@ -247,7 +246,7 @@ export const CreateTrip: FC = () => {
                 {
                   backgroundColor:
                     isDirty && !isSubmitting
-                      ? Styles[theme].PrimaryInitial
+                      ? Styles[theme].IconAccent
                       : Styles[theme].PrimaryDisabled,
                 },
               ]}

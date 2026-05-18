@@ -6,13 +6,12 @@ import MapView, { Marker, Polyline, Region } from "react-native-maps";
 
 import { CreateActivityModal } from "@/src/features/activities/create_activity";
 import { EditActivityModal } from "@/src/features/activities/edit_activity/ui/edit_activity";
-import { useGetCurrentLocation } from "@/src/shared/hooks";
-import { supabase, useTheme } from "@/src/shared/lib";
+import { useGetCurrentLocation, useTripActivities } from "@/src/shared/hooks";
+import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { Activity, TripMember } from "@/src/shared/types";
 import { Loader } from "@/src/shared/ui/loaders";
 import { ActivitiesListModal } from "@/src/widgets/activities_list/ui/activities_list_modal";
-import { useActivityStore } from "../model";
 import { Coordinate, fetchRoadRoute } from "../model/trip_map_actions";
 import { RouteBuilder } from "./route_builder";
 import { useGetStyle } from "./styles";
@@ -46,41 +45,15 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   const styles = useGetStyle(theme);
   const {
     activities,
-    loading: loadingActivities,
-    fetchActivities,
+    isLoading: loadingActivities,
     addActivity,
     updateActivity,
     removeActivity,
-    clear,
-  } = useActivityStore();
+  } = useTripActivities(tripId);
 
   useEffect(() => {
     fetchLocation();
   }, []);
-
-  useEffect(() => {
-    if (!tripId) return;
-
-    (async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const currentUserId = session?.user.id || null;
-
-      await Promise.all([
-        fetchActivities(tripId),
-        supabase
-          .from("trip_members")
-          .select("role")
-          .eq("trip_id", tripId)
-          .eq("user_id", currentUserId)
-          .single()
-          .then((data) => setUserRole(data.data?.role)),
-      ]);
-    })();
-
-    return () => clear();
-  }, [tripId]);
 
   const routePoints = useMemo(() => {
     return activities
@@ -143,10 +116,11 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
   const handleAddActivity = async (data: Partial<Activity>) => {
     if (!tripId || !selectedCoord) return;
     try {
-      await addActivity(tripId, {
+      await addActivity({
         ...data,
+        type: data.type || "custom",
         location: { lat: selectedCoord.latitude, lng: selectedCoord.longitude },
-      } as Activity);
+      });
       setisCreateActivityModalVisible(false);
       setSelectedCoord(null);
     } catch (error: unknown) {
@@ -159,7 +133,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
     data: Partial<Activity>,
   ) => {
     try {
-      await updateActivity(activityId, data);
+      await updateActivity({ id: activityId, data });
     } catch (error: unknown) {
       console.error(error);
     } finally {

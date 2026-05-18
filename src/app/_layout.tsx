@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 import { useTheme } from "@/src/shared/lib";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider } from "../shared/lib/auth-context";
 import { ThemeProvider } from "../shared/lib/theme-context";
@@ -56,13 +57,17 @@ const App = () => {
 };
 
 export default function RootLayout() {
+  const queryClient = new QueryClient();
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <ThemeProvider>
-          <App />
-        </ThemeProvider>
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ThemeProvider>
+            <App />
+          </ThemeProvider>
+        </AuthProvider>
+      </QueryClientProvider>
     </GestureHandlerRootView>
   );
 }

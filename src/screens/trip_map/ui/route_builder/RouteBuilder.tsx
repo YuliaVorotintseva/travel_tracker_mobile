@@ -9,7 +9,7 @@ import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
 
-import { useActivityStore } from "../../model";
+import { useTripActivities } from "@/src/shared/hooks";
 import { useGetStyle } from "./styles";
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export const RouteBuilder = ({ tripId, userRole, onClose }: Props) => {
-  const { activities, updateActivity } = useActivityStore();
+  const { activities, updateActivity } = useTripActivities(tripId);
   const [route, setRoute] = useState<Activity[]>([]);
   const [saving, setSaving] = useState(false);
   const styles = useGetStyle();
@@ -62,7 +62,7 @@ export const RouteBuilder = ({ tripId, userRole, onClose }: Props) => {
 
       await Promise.all(updates);
       route.forEach((act, index) =>
-        updateActivity(act.id, { route_order: index + 1 }),
+        updateActivity({ id: act.id, data: { route_order: index + 1 } }),
       );
 
       onClose();

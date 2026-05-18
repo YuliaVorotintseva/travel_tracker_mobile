@@ -1,6 +1,7 @@
 import { FC, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
+import { useMyProfile } from "@/src/shared/hooks";
 import { CloseIcon } from "@/src/shared/icons";
 import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
@@ -22,14 +23,12 @@ import {
   ProfileFormData,
   ProfileFormResolver,
 } from "../lib/form-resolver";
-import { useMyProfileStore } from "../model";
 import { getStyles } from "./styles";
 
 export const MyProfile: FC = () => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const { myData, error, fetchMyData, updateMyData, clear } =
-    useMyProfileStore();
+  const { profile, error, updateProfile } = useMyProfile();
   const {
     control,
     reset,
@@ -42,26 +41,21 @@ export const MyProfile: FC = () => {
   });
 
   useEffect(() => {
-    fetchMyData();
-    return () => clear();
-  }, []);
-
-  useEffect(() => {
     reset({
-      full_name: !!myData ? myData?.full_name : "",
-      email: !!myData ? myData?.email : "",
+      full_name: !!profile ? profile?.full_name : "",
+      email: !!profile ? profile?.email : "",
     });
-  }, [myData]);
+  }, [profile]);
 
   const onSubmit = handleSubmit(async (input: ProfileFormData) => {
-    if (!myData) return;
+    if (!profile) return;
 
     const editedData = {
-      ...myData,
+      ...profile,
       ...input,
     };
 
-    updateMyData(editedData);
+    updateProfile(editedData);
   });
 
   return (
@@ -107,8 +101,8 @@ export const MyProfile: FC = () => {
             <View style={styles.formInputs}>
               <View style={styles.uploadImgArea}>
                 <AvatarPicker
-                  userId={myData?.id!}
-                  currentAvatarUrl={myData?.avatar_url}
+                  userId={profile?.id!}
+                  currentAvatarUrl={profile?.avatar_url}
                 />
               </View>
 
@@ -167,7 +161,9 @@ export const MyProfile: FC = () => {
               />
             </View>
           </View>
-          <View>{!!error && <Text style={styles.error}>{error}</Text>}</View>
+          <View>
+            {!!error && <Text style={styles.error}>{error.message}</Text>}
+          </View>
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

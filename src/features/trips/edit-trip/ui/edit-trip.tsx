@@ -3,12 +3,12 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useMyProfileStore } from "@/src/features/my_profile";
-import { useMyTripsStore } from "@/src/screens/trips/model/my_trips_store";
+import { useMyProfile, useMyTrips } from "@/src/shared/hooks";
 import { BackIcon } from "@/src/shared/icons";
 import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { CURRENCIES, Currency, TripWithMembers } from "@/src/shared/types";
+import { Profiles } from "@/src/shared/types/api/generated";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
 import { TripMembersList } from "@/src/widgets/trip_members_list";
 import { useRouter } from "expo-router";
@@ -31,13 +31,8 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   const [error, setError] = useState<string | null>(null);
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
   const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
-  const {
-    trips,
-    fetchTrips,
-    updateTrip,
-    clear: clearTrips,
-  } = useMyTripsStore();
-  const { myData, fetchMyData, clear: clearMyData } = useMyProfileStore();
+  const { profile } = useMyProfile();
+  const { trips, updateTrip } = useMyTrips((profile as Profiles).id);
   const {
     control,
     reset,
@@ -56,19 +51,11 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   });
 
   useEffect(() => {
-    fetchMyData();
-    return () => clearMyData();
-  }, []);
+    if (!profile) return;
 
-  useEffect(() => {
-    if (!myData) return;
-
-    fetchTrips(myData?.id);
-    const trip = trips.find((t) => t.id === tripId);
+    const trip = trips?.find((t) => t.id === tripId);
     setTrip(trip ?? null);
-
-    return () => clearTrips();
-  }, [myData]);
+  }, [profile]);
 
   useEffect(() => {
     if (trip) {
@@ -90,7 +77,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
         ...input,
       };
 
-      const updatedTrip = await updateTrip(tripId, editedData);
+      const updatedTrip = await updateTrip({ id: tripId, data: editedData });
       setTrip(updatedTrip);
       router.back();
     } catch (error: unknown) {

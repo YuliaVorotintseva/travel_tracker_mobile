@@ -5,12 +5,12 @@ import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MyTripCard } from "@/src/entities/trips/my-trip-card/ui";
-import { useMyProfileStore } from "@/src/features/my_profile";
+import { useMyProfile, useMyTrips } from "@/src/shared/hooks";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { CreateButton } from "@/src/shared/ui";
 import { ConfirmDeleteModal } from "@/src/shared/ui/confirm_delete_modal";
 import { Loader } from "@/src/shared/ui/loaders";
-import { useMyTripsStore } from "../model/my_trips_store";
+import { useQueryClient } from "@tanstack/react-query";
 import { getStyles } from "./styles";
 
 export const MyTripsScreen: FC = () => {
@@ -20,34 +20,27 @@ export const MyTripsScreen: FC = () => {
   const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] =
     useState(false);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const { profile, isLoading: isProfileLoading } = useMyProfile();
   const {
-    trips: myTrips,
-    loading,
-    fetchTrips,
+    trips,
+    isLoading: isTripsLoading,
     removeTrip,
-    clear: clearTrips,
-  } = useMyTripsStore();
-  const { myData, fetchMyData, clear: clearMyData } = useMyProfileStore();
+  } = useMyTrips(profile?.id);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    fetchMyData();
-    return () => clearMyData();
-  }, []);
+    if (!profile?.id) return;
 
-  useEffect(() => {
-    if (!myData?.id) return;
-
-    const channel = supabase.channel(`trips-sync-${myData.id}`);
-
-    fetchTrips(myData.id);
-
+    const channel = supabase.channel(`trips-sync-${profile.id}`);
     const tables = ["trips", "trip_members"] as const;
 
     tables.forEach((table) => {
       channel.on(
         "postgres_changes",
         { event: "*", schema: "public", table },
-        () => fetchTrips(myData.id),
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["trips", "userId"] });
+        },
       );
     });
 
@@ -57,9 +50,8 @@ export const MyTripsScreen: FC = () => {
 
     return () => {
       channel.unsubscribe();
-      clearTrips();
     };
-  }, [myData]);
+  }, [profile]);
 
   const handleDelete = async (tripId: string) => {
     const { error } = await supabase.from("trips").delete().eq("id", tripId);
@@ -71,17 +63,17 @@ export const MyTripsScreen: FC = () => {
     console.log("Trip was successfully deleted!");
   };
 
-  if (loading) {
+  if (isProfileLoading || isTripsLoading) {
     return <Loader />;
   }
 
   return (
     <SafeAreaView style={styles.wrapper}>
       <View style={{ flex: 1 }}>
-        {!!myTrips?.length ? (
+        {!!trips?.length ? (
           <View style={{ flex: 1 }}>
             <FlashList
-              data={myTrips}
+              data={trips}
               renderItem={({ item }) => (
                 <MyTripCard
                   onPress={() => router.push(`/edit-trip/${item.id}`)}

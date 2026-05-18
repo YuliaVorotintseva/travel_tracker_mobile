@@ -3,7 +3,7 @@ import { FC, useEffect } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useMyProfileStore } from "@/src/features/my_profile";
+import { useMyProfile } from "@/src/shared/hooks";
 import { DarkThemeIcon, LightThemeIcon, LogOutIcon } from "@/src/shared/icons";
 import { supabase, useAuth, useTheme } from "@/src/shared/lib";
 import { Profiles } from "@/src/shared/types/api/generated";
@@ -14,22 +14,16 @@ export const Settings: FC = () => {
   const { logout } = useAuth();
   const { toggleTheme, theme } = useTheme();
   const styles = getStyles(theme);
-  const { myData, loading, fetchMyData, updateMyData, clear } =
-    useMyProfileStore();
+  const { profile, isLoading, updateProfile } = useMyProfile();
 
   useEffect(() => {
-    fetchMyData();
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      updateMyData(session?.user! as Profiles);
+      updateProfile(session?.user! as Profiles);
     });
 
-    return () => {
-      subscription.unsubscribe();
-      clear();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
@@ -41,12 +35,12 @@ export const Settings: FC = () => {
     <Pressable style={styles.modalOverlay} onPress={() => router.back()}>
       <SafeAreaView style={styles.modalContent}>
         <View style={styles.profileSettings}>
-          {!loading && (
+          {!isLoading && (
             <View style={styles.userInfo}>
               <Pressable onPress={() => router.push("/users/my_profile")}>
-                {!!myData?.avatar_url ? (
+                {!!profile?.avatar_url ? (
                   <Image
-                    source={{ uri: myData.avatar_url }}
+                    source={{ uri: profile.avatar_url }}
                     style={styles.avatar}
                   />
                 ) : (
@@ -58,7 +52,7 @@ export const Settings: FC = () => {
               </Pressable>
               <View>
                 <Text style={styles.optionText}>
-                  {myData?.full_name ? myData?.full_name : "unknown"}
+                  {profile?.full_name ? profile?.full_name : "unknown"}
                 </Text>
               </View>
             </View>
