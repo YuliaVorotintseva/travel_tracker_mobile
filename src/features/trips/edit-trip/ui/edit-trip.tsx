@@ -3,14 +3,20 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useMyProfile, useMyTrips } from "@/src/shared/hooks";
+import { useMyProfile, useMyTrips, useTripMembers } from "@/src/shared/hooks";
 import { BackIcon } from "@/src/shared/icons";
 import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
-import { CURRENCIES, Currency, TripWithMembers } from "@/src/shared/types";
+import {
+  CURRENCIES,
+  Currency,
+  TripMemberWithProfile,
+  TripWithMembers,
+} from "@/src/shared/types";
 import { Profiles } from "@/src/shared/types/api/generated";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
-import { TripMembersList } from "@/src/widgets/trip_members_list";
+import { Loader } from "@/src/shared/ui/loaders";
+import { TripMembersListModal } from "@/src/widgets/trip_members_list";
 import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
 
@@ -31,8 +37,10 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   const [error, setError] = useState<string | null>(null);
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
   const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
+  const [isMemberListOpen, setIsMemberListOpen] = useState(false);
   const { profile } = useMyProfile();
   const { trips, updateTrip } = useMyTrips((profile as Profiles).id);
+  const { members } = useTripMembers(trip?.id ?? null);
   const {
     control,
     reset,
@@ -232,14 +240,13 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
             />
           </View>
           <View>
-            <Text>
-              {!!trip?.trip_members && trip.trip_members.length > 0
-                ? `Trip members(${trip.trip_members.length}):`
-                : "There is no any member yet"}
-            </Text>
-            {!!trip && trip.trip_members && trip.trip_members.length && (
-              <TripMembersList tripId={tripId} />
-            )}
+            <Pressable onPress={() => setIsMemberListOpen(true)}>
+              <Text>
+                {!!trip?.trip_members && trip.trip_members.length > 0
+                  ? `Trip members(${trip.trip_members.length})`
+                  : "There is no any member yet"}
+              </Text>
+            </Pressable>
           </View>
           {!!error && <Text style={styles.error}>{`Problem: ${error}`}</Text>}
           <Pressable onPress={onSubmit} style={styles.confirmBtn}>
@@ -255,6 +262,15 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
             </Text>
           </Pressable>
         </View>
+
+        {members && members.length > 0 && isMemberListOpen ? (
+          <TripMembersListModal
+            members={members as TripMemberWithProfile[]}
+            onClose={() => setIsMemberListOpen(false)}
+          />
+        ) : (
+          isMemberListOpen && <Loader />
+        )}
       </SafeAreaView>
     </ScrollView>
   );

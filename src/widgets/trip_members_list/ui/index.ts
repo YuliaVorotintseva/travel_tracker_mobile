@@ -1,1 +1,1 @@
-export * from "./trip_members_list";
+export * from "./trip_members_list_modal";
