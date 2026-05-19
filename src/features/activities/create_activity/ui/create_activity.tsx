@@ -2,9 +2,9 @@ import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { Activity, ACTIVITY_TYPES } from "@/src/shared/types";
 import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
-import { getFormatDate } from "@/src/shared/utils";
+import { getFormatDate, toLocalISODate } from "@/src/shared/utils";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import {
   Modal,
   Pressable,
@@ -27,6 +27,7 @@ type CreateActivityFormData = {
   title: string;
   type: Activity["type"];
   start_time: string;
+  end_time: string;
   notes: string;
 };
 
@@ -49,9 +50,11 @@ export const CreateActivityModal = ({
       title: "",
       type: "custom",
       start_time: getFormatDate(new Date(Date.now())),
+      end_time: getFormatDate(new Date(Date.now())),
     },
     mode: "onBlur",
   });
+  const startDate = useWatch({ control, name: "start_time" });
 
   const handleSave = handleSubmit(async (input: CreateActivityFormData) => {
     reset();
@@ -128,15 +131,47 @@ export const CreateActivityModal = ({
                 <DatePickerModal
                   visible={isCalendarVisible}
                   onClose={() => setIsCalendarVisible(false)}
-                  onSelect={onChange}
+                  onSelect={(date) => {
+                    const localDate = toLocalISODate(new Date(date));
+                    onChange(localDate);
+                  }}
                   minDate={new Date()}
                 />
 
                 <Pressable onPress={() => setIsCalendarVisible(true)}>
-                  <Text style={styles.label}>Start day</Text>
+                  <Text style={styles.label}>Start time</Text>
                   <TextInput
-                    placeholder="Enter start day"
+                    placeholder="Enter start time"
                     onChange={onChange}
+                    value={value}
+                    autoCapitalize="none"
+                    style={styles.input}
+                    editable={false}
+                  />
+                </Pressable>
+              </View>
+            )}
+          />
+
+          <Controller
+            name="end_time"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <View>
+                <DatePickerModal
+                  visible={isCalendarVisible}
+                  onClose={() => setIsCalendarVisible(false)}
+                  onSelect={(date) => {
+                    const localDate = toLocalISODate(new Date(date));
+                    onChange(localDate);
+                  }}
+                  minDate={!!startDate ? new Date(startDate) : new Date()}
+                />
+
+                <Pressable onPress={() => setIsCalendarVisible(true)}>
+                  <Text style={styles.label}>End time</Text>
+                  <TextInput
+                    placeholder="Enter end time"
                     value={value}
                     autoCapitalize="none"
                     style={styles.input}

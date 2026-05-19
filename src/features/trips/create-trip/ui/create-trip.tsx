@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import {
   Keyboard,
   Pressable,
@@ -18,7 +18,7 @@ import { Styles } from "@/src/shared/styles";
 import { CURRENCIES, Currency } from "@/src/shared/types";
 import { Profiles } from "@/src/shared/types/api/generated";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
-import { getFormatDate } from "@/src/shared/utils";
+import { getFormatDate, toLocalISODate } from "@/src/shared/utils";
 import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
 
@@ -37,9 +37,6 @@ export const CreateTrip: FC = () => {
   const router = useRouter();
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
   const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
-  const [currency, setCurrency] = useState<Currency>("USD");
   const {
     control,
     handleSubmit,
@@ -57,6 +54,7 @@ export const CreateTrip: FC = () => {
   });
   const { profile, error } = useMyProfile();
   const { addTrip } = useMyTrips((profile as Profiles).id);
+  const startDate = useWatch({ control, name: "start_date" });
 
   const onSubmit = handleSubmit(async (input: CreateTripData) => {
     if (!profile) {
@@ -162,18 +160,14 @@ export const CreateTrip: FC = () => {
               <Controller
                 name="start_date"
                 control={control}
-                render={() => (
+                render={({ field: { onChange, value } }) => (
                   <View>
                     <DatePickerModal
                       visible={isStartCalendarVisible}
                       onClose={() => setIsStartCalendarVisible(false)}
                       onSelect={(date) => {
-                        setStartDate(new Date(date).toISOString());
-                        if (!endDate) {
-                          const next = new Date(date);
-                          next.setDate(next.getDate() + 1);
-                          setEndDate(next.toISOString());
-                        }
+                        const localDate = toLocalISODate(new Date(date));
+                        onChange(localDate);
                       }}
                       minDate={new Date()}
                     />
@@ -183,7 +177,11 @@ export const CreateTrip: FC = () => {
                       <TextInput
                         placeholder="Enter start day"
                         placeholderTextColor={Styles[theme].TextSecondary}
-                        value={getFormatDate(new Date(startDate!))}
+                        value={
+                          !!value
+                            ? getFormatDate(new Date(value))
+                            : getFormatDate()
+                        }
                         autoCapitalize="none"
                         style={styles.input}
                         editable={false}
@@ -195,15 +193,16 @@ export const CreateTrip: FC = () => {
               <Controller
                 name="end_date"
                 control={control}
-                render={() => (
+                render={({ field: { onChange, value } }) => (
                   <View>
                     <DatePickerModal
                       visible={isFinishCalendarVisible}
                       onClose={() => setIsFinishCalendarVisible(false)}
-                      onSelect={(date) =>
-                        setEndDate(new Date(date).toISOString())
-                      }
-                      minDate={startDate ? new Date(startDate) : new Date()}
+                      onSelect={(date) => {
+                        const localDate = toLocalISODate(new Date(date));
+                        onChange(localDate);
+                      }}
+                      minDate={!!startDate ? new Date(startDate) : new Date()}
                     />
 
                     <Pressable onPress={() => setIsFinishCalendarVisible(true)}>
@@ -211,7 +210,11 @@ export const CreateTrip: FC = () => {
                       <TextInput
                         placeholder="Enter start day"
                         placeholderTextColor={Styles[theme].TextSecondary}
-                        value={getFormatDate(new Date(endDate!))}
+                        value={
+                          !!value
+                            ? getFormatDate(new Date(value))
+                            : getFormatDate()
+                        }
                         autoCapitalize="none"
                         style={styles.input}
                         editable={false}
@@ -223,12 +226,12 @@ export const CreateTrip: FC = () => {
               <Controller
                 name="currency"
                 control={control}
-                render={() => (
+                render={({ field: { onChange, value } }) => (
                   <View>
                     <Text style={styles.label}>Choose currency</Text>
                     <SelectPicker
-                      value={currency}
-                      onChange={setCurrency}
+                      value={value}
+                      onChange={onChange}
                       options={CURRENCIES}
                       searchable={false}
                     />

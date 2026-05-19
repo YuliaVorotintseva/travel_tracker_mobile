@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -16,6 +16,7 @@ import {
 import { Profiles } from "@/src/shared/types/api/generated";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
 import { Loader } from "@/src/shared/ui/loaders";
+import { getFormatDate, toLocalISODate } from "@/src/shared/utils";
 import { TripMembersListModal } from "@/src/widgets/trip_members_list";
 import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
@@ -51,12 +52,13 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
       title: "",
       description: "",
       destination: "",
-      start_date: "--:--",
-      end_date: "--:--",
+      start_date: new Date().toISOString(),
+      end_date: new Date().toISOString(),
       currency: "USD",
     },
     mode: "onBlur",
   });
+  const startDate = useWatch({ control, name: "start_date" });
 
   useEffect(() => {
     if (!profile) return;
@@ -178,7 +180,10 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                   <DatePickerModal
                     visible={isStartCalendarVisible}
                     onClose={() => setIsStartCalendarVisible(false)}
-                    onSelect={onChange}
+                    onSelect={(date) => {
+                      const localDate = toLocalISODate(new Date(date));
+                      onChange(localDate);
+                    }}
                     minDate={new Date()}
                   />
 
@@ -187,8 +192,11 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                     <TextInput
                       placeholder="Enter start day"
                       placeholderTextColor={Styles[theme].TextSecondary}
-                      onChange={onChange}
-                      value={value}
+                      value={
+                        !!value
+                          ? getFormatDate(new Date(value))
+                          : getFormatDate()
+                      }
                       autoCapitalize="none"
                       style={styles.input}
                       editable={false}
@@ -205,7 +213,11 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                   <DatePickerModal
                     visible={isFinishCalendarVisible}
                     onClose={() => setIsFinishCalendarVisible(false)}
-                    onSelect={onChange}
+                    onSelect={(date) => {
+                      const localDate = toLocalISODate(new Date(date));
+                      onChange(localDate);
+                    }}
+                    minDate={startDate ? new Date(startDate) : new Date()}
                   />
 
                   <Pressable onPress={() => setIsFinishCalendarVisible(true)}>
@@ -213,8 +225,11 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                     <TextInput
                       placeholder="Enter start day"
                       placeholderTextColor={Styles[theme].TextSecondary}
-                      onChange={onChange}
-                      value={value}
+                      value={
+                        !!value
+                          ? getFormatDate(new Date(value))
+                          : getFormatDate()
+                      }
                       autoCapitalize="none"
                       style={styles.input}
                       editable={false}

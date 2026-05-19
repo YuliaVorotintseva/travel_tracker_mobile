@@ -137,25 +137,18 @@ export const MyProfile: FC = () => {
               <Controller
                 name="email"
                 control={control}
-                render={({
-                  field: { onBlur, onChange, value },
-                  fieldState: { error },
-                }) => (
+                disabled
+                render={({ field: { value } }) => (
                   <View>
                     <Text style={styles.label}>E-mail</Text>
                     <TextInput
                       placeholder="Enter your e-mail"
                       placeholderTextColor={Styles[theme].TextSecondary}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
                       value={value}
                       keyboardType="email-address"
                       autoCapitalize="none"
                       style={styles.input}
                     />
-                    {!!error && (
-                      <Text style={styles.error}>{error.message}</Text>
-                    )}
                   </View>
                 )}
               />
