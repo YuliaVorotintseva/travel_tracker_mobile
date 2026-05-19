@@ -22,7 +22,7 @@ export type TripMemberWithProfile = {
     id: string;
     full_name: string | null;
     avatar_url: string | null;
-  }[];
+  } | null;
 };
 
 export type Activity = Activities & {

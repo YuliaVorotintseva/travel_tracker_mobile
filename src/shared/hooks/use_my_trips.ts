@@ -84,6 +84,7 @@ export const useMyTrips = (userId: string | null) => {
   });
 
   const updateMutation = useMutation({
+    retry: false,
     mutationFn: async ({
       id,
       data,
@@ -122,6 +123,7 @@ export const useMyTrips = (userId: string | null) => {
   });
 
   const removeMutation = useMutation({
+    retry: false,
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("trips").delete().eq("id", id);
 

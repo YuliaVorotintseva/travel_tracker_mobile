@@ -31,6 +31,7 @@ export const useTripActivities = (tripId: string | null) => {
   });
 
   const addMutation = useMutation({
+    retry: false,
     mutationFn: async (newActivity: Omit<Partial<Activity>, "id">) => {
       const {
         id: _,
@@ -65,6 +66,7 @@ export const useTripActivities = (tripId: string | null) => {
   });
 
   const updateMutation = useMutation({
+    retry: false,
     mutationFn: async ({
       id,
       data,
@@ -101,6 +103,7 @@ export const useTripActivities = (tripId: string | null) => {
   });
 
   const removeMutation = useMutation({
+    retry: false,
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("activities").delete().eq("id", id);
 

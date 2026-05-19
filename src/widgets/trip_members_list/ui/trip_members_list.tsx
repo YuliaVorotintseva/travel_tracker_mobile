@@ -1,32 +1,18 @@
 import { FlashList } from "@shopify/flash-list";
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { Image, Text, View } from "react-native";
 
-import { supabase } from "@/src/shared/lib";
-import { TripMemberWithProfile } from "@/src/shared/types";
+import { useTripMembers } from "@/src/shared/hooks";
 import { getFormatDate } from "@/src/shared/utils";
 import { getStyles } from "./styles";
 
 export const TripMembersList: FC<{ tripId: string }> = ({ tripId }) => {
-  const [members, setMembers] = useState<TripMemberWithProfile[] | null>(null);
   const styles = getStyles();
-
-  useEffect(() => {
-    const init = async () => {
-      const { data, error } = await supabase
-        .from("trip_members")
-        .select(`user_id, role, joined_at, profiles (full_name, avatar_url )`)
-        .eq("trip_id", tripId);
-
-      if (error) throw error;
-      setMembers((data as TripMemberWithProfile[]) ?? null);
-    };
-    init();
-  }, []);
+  const { members } = useTripMembers(tripId);
 
   return (
     <View>
-      {!!members && members.length && (
+      {!!members?.length && members.length > 0 && (
         <View style={{ flex: 1 }}>
           <FlashList
             data={members}
