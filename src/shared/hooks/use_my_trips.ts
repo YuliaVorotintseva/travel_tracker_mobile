@@ -48,16 +48,25 @@ export const useMyTrips = (userId: string | null) => {
   });
 
   const addMutation = useMutation({
+    retry: false,
     mutationFn: async (data: Omit<TripWithMembers, "id" | "trip_members">) => {
+      const {
+        id: _,
+        trip_members: __,
+        ...cleanData
+      } = data as Record<string, any>;
+
       const { data: newTrip, error } = await supabase
         .from("trips")
-        .insert(data)
-        .select()
+        .insert(cleanData)
+        .select("*")
         .single();
 
-      if (!!error) {
+      if (error?.code || error?.message) {
+        console.error(error);
         throw error;
       }
+
       return newTrip;
     },
     onMutate: async (trip) => {
@@ -82,17 +91,20 @@ export const useMyTrips = (userId: string | null) => {
       id: string;
       data: Partial<TripWithMembers>;
     }) => {
+      console.log("TO UPDATE: ", data);
       const { data: updatedData, error } = await supabase
         .from("trips")
         .update(data)
         .eq("id", id)
-        .select()
+        .select("*")
         .single();
 
-      if (!!error) {
+      if (error?.code || error?.message) {
+        console.error(error);
         throw error;
       }
 
+      console.log("UPDATED: ", updatedData);
       return updatedData;
     },
     onMutate: async ({ id, data }) => {
@@ -112,7 +124,11 @@ export const useMyTrips = (userId: string | null) => {
   const removeMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("trips").delete().eq("id", id);
-      if (error) throw error;
+
+      if (error?.code || error?.message) {
+        console.error(error);
+        throw error;
+      }
     },
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey });

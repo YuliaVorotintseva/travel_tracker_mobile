@@ -63,11 +63,9 @@ export const CreateTrip: FC = () => {
       return;
     }
 
-    const tempId = `temp_${Date.now()}`;
     const newTripData = {
       ...input,
       created_by: profile.id,
-      id: tempId,
     };
 
     try {
