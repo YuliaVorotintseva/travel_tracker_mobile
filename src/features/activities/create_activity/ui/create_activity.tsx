@@ -1,8 +1,3 @@
-import { useTheme } from "@/src/shared/lib";
-import { Styles } from "@/src/shared/styles";
-import { Activity, ACTIVITY_TYPES } from "@/src/shared/types";
-import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
-import { getFormatDate, toLocalISODate } from "@/src/shared/utils";
 import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import {
@@ -14,6 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { useTheme } from "@/src/shared/lib";
+import { Styles } from "@/src/shared/styles";
+import { Activity, ACTIVITY_TYPES } from "@/src/shared/types";
+import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
+import { getFormatDateTime, toLocalDateTime } from "@/src/shared/utils";
 import { useGetStyle } from "../../styles";
 
 interface Props {
@@ -49,8 +50,9 @@ export const CreateActivityModal = ({
     defaultValues: {
       title: "",
       type: "custom",
-      start_time: getFormatDate(new Date(Date.now())),
-      end_time: getFormatDate(new Date(Date.now())),
+      start_time: getFormatDateTime(new Date(Date.now())),
+      end_time: getFormatDateTime(new Date(Date.now())),
+      notes: "",
     },
     mode: "onBlur",
   });
@@ -132,7 +134,7 @@ export const CreateActivityModal = ({
                   visible={isCalendarVisible}
                   onClose={() => setIsCalendarVisible(false)}
                   onSelect={(date) => {
-                    const localDate = toLocalISODate(new Date(date));
+                    const localDate = toLocalDateTime(new Date(date));
                     onChange(localDate);
                   }}
                   minDate={new Date()}
@@ -162,7 +164,7 @@ export const CreateActivityModal = ({
                   visible={isCalendarVisible}
                   onClose={() => setIsCalendarVisible(false)}
                   onSelect={(date) => {
-                    const localDate = toLocalISODate(new Date(date));
+                    const localDate = toLocalDateTime(new Date(date));
                     onChange(localDate);
                   }}
                   minDate={!!startDate ? new Date(startDate) : new Date()}

@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { CloseIcon } from "@/src/shared/icons";
 import { useTheme } from "@/src/shared/lib";
 import { Activity } from "@/src/shared/types";
-import { getFormatDate } from "@/src/shared/utils";
+import { getFormatDateTime, parseLocalDateTime } from "@/src/shared/utils";
 import { useGetStyles } from "./styles";
 
 type ActivitiesListModalProps = {
@@ -47,12 +47,12 @@ export const ActivitiesListModal: FC<ActivitiesListModalProps> = ({
                     <Text style={styles.info}>{item.notes}</Text>
                     <Text style={styles.info}>
                       {item.start_time &&
-                        `Start time: ${getFormatDate(new Date(item.start_time))}`}
+                        `Start time: ${getFormatDateTime(parseLocalDateTime(item.start_time))}`}
                     </Text>
                     <Text style={styles.info}>
                       {item.start_time &&
                         item.end_time &&
-                        `Start time: ${getFormatDate(new Date(item.end_time))}`}
+                        `End time: ${getFormatDateTime(parseLocalDateTime(item.end_time))}`}
                     </Text>
                   </Pressable>
                 )}

@@ -46,8 +46,8 @@ export const CreateTrip: FC = () => {
       title: "",
       description: "",
       destination: "",
-      start_date: new Date().toISOString(),
-      end_date: new Date().toISOString(),
+      start_date: toLocalISODate(new Date()),
+      end_date: toLocalISODate(new Date()),
       currency: "USD",
     },
     mode: "onBlur",
@@ -169,6 +169,7 @@ export const CreateTrip: FC = () => {
                         const localDate = toLocalISODate(new Date(date));
                         onChange(localDate);
                       }}
+                      mode="date"
                       minDate={new Date()}
                     />
 
@@ -179,8 +180,8 @@ export const CreateTrip: FC = () => {
                         placeholderTextColor={Styles[theme].TextSecondary}
                         value={
                           !!value
-                            ? getFormatDate(new Date(value))
-                            : getFormatDate()
+                            ? toLocalISODate(new Date(value))
+                            : toLocalISODate(new Date())
                         }
                         autoCapitalize="none"
                         style={styles.input}

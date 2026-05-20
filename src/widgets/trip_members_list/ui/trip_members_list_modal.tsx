@@ -4,7 +4,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { CloseIcon } from "@/src/shared/icons";
 import { TripMemberWithProfile } from "@/src/shared/types";
-import { getFormatDate } from "@/src/shared/utils";
+import { getFormatDateTime } from "@/src/shared/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetStyles } from "./styles";
 
@@ -49,7 +49,7 @@ export const TripMembersListModal: FC<TripMembersListModalProps> = ({
                           ? item.profiles.full_name
                           : "unknown"}
                       </Text>
-                      <Text>{getFormatDate(new Date(item.joined_at))}</Text>
+                      <Text>{getFormatDateTime(new Date(item.joined_at))}</Text>
                     </View>
                     <Text style={styles.role}>{item.role}</Text>
                   </Pressable>

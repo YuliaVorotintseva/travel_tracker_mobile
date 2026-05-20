@@ -4,7 +4,7 @@ import { BackIcon, UserIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { Profiles } from "@/src/shared/types/api/generated";
 import { IconBackButton } from "@/src/shared/ui";
-import { getFormatDate } from "@/src/shared/utils";
+import { getFormatDateTime } from "@/src/shared/utils";
 import { FC, useEffect, useState } from "react";
 import { getStyles } from "./styles";
 
@@ -46,7 +46,7 @@ export const Profile: FC<{ userId: string }> = ({ userId }) => {
           <Text style={styles.text}>{user?.full_name}</Text>
           <Text style={styles.text}>{user?.email}</Text>
           <Text style={styles.text}>
-            {getFormatDate(new Date(user?.created_at!))}
+            {getFormatDateTime(new Date(user?.created_at!))}
           </Text>
         </View>
       </View>

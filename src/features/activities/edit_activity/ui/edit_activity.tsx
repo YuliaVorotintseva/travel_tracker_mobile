@@ -1,9 +1,3 @@
-import { useTheme } from "@/src/shared/lib";
-import { Styles } from "@/src/shared/styles";
-import { Activity, ACTIVITY_TYPES } from "@/src/shared/types";
-import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
-import { ConfirmDeleteModal } from "@/src/shared/ui/confirm_delete_modal";
-import { toLocalISODate } from "@/src/shared/utils";
 import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import {
@@ -16,6 +10,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { useTheme } from "@/src/shared/lib";
+import { Styles } from "@/src/shared/styles";
+import { Activity, ACTIVITY_TYPES } from "@/src/shared/types";
+import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
+import { ConfirmDeleteModal } from "@/src/shared/ui/confirm_delete_modal";
+import { toLocalDateTime } from "@/src/shared/utils";
 import { useGetStyle } from "../../styles";
 
 interface Props {
@@ -41,7 +42,10 @@ export const EditActivityModal = ({
   onDelete,
   activity,
 }: Props) => {
-  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+  const [isStartTimeCalendarVisible, setIsStartTimeCalendarVisible] =
+    useState(false);
+  const [isEndTimeCalendarVisible, setIsEndTimeCalendarVisible] =
+    useState(false);
   const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] =
     useState(false);
   const { theme } = useTheme();
@@ -131,16 +135,16 @@ export const EditActivityModal = ({
             render={({ field: { onChange, value } }) => (
               <View>
                 <DatePickerModal
-                  visible={isCalendarVisible}
-                  onClose={() => setIsCalendarVisible(false)}
+                  visible={isStartTimeCalendarVisible}
+                  onClose={() => setIsStartTimeCalendarVisible(false)}
                   onSelect={(date) => {
-                    const localDate = toLocalISODate(new Date(date));
+                    const localDate = toLocalDateTime(new Date(date));
                     onChange(localDate);
                   }}
                   minDate={new Date()}
                 />
 
-                <Pressable onPress={() => setIsCalendarVisible(true)}>
+                <Pressable onPress={() => setIsStartTimeCalendarVisible(true)}>
                   <Text style={styles.label}>Start time</Text>
                   <TextInput
                     placeholder="Enter start time"
@@ -161,16 +165,16 @@ export const EditActivityModal = ({
             render={({ field: { onChange, value } }) => (
               <View>
                 <DatePickerModal
-                  visible={isCalendarVisible}
-                  onClose={() => setIsCalendarVisible(false)}
+                  visible={isEndTimeCalendarVisible}
+                  onClose={() => setIsEndTimeCalendarVisible(false)}
                   onSelect={(date) => {
-                    const localDate = toLocalISODate(new Date(date));
+                    const localDate = toLocalDateTime(new Date(date));
                     onChange(localDate);
                   }}
                   minDate={!!startDate ? new Date(startDate) : new Date()}
                 />
 
-                <Pressable onPress={() => setIsCalendarVisible(true)}>
+                <Pressable onPress={() => setIsEndTimeCalendarVisible(true)}>
                   <Text style={styles.label}>End time</Text>
                   <TextInput
                     placeholder="Enter end time"
