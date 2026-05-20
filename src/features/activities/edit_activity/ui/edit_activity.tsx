@@ -4,7 +4,6 @@ import {
   KeyboardAvoidingView,
   Modal,
   Pressable,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -12,9 +11,8 @@ import {
 } from "react-native";
 
 import { useTheme } from "@/src/shared/lib";
-import { Styles } from "@/src/shared/styles";
 import { Activity, ACTIVITY_TYPES } from "@/src/shared/types";
-import { DatePickerModal, SelectPicker } from "@/src/shared/ui";
+import { ControlButton, DatePickerModal, SelectPicker } from "@/src/shared/ui";
 import { ConfirmDeleteModal } from "@/src/shared/ui/confirm_delete_modal";
 import { toLocalDateTime } from "@/src/shared/utils";
 import { useGetStyle } from "../../styles";
@@ -210,30 +208,18 @@ export const EditActivityModal = ({
             )}
           />
 
-          <TouchableOpacity
-            style={StyleSheet.compose(styles.controlBtn, {
-              backgroundColor:
-                !isDirty || isSubmitting
-                  ? Styles[theme].PrimaryDisabled
-                  : Styles[theme].IconAccent,
-            })}
-            onPress={handleSave}
-            disabled={!isDirty || isSubmitting}
-          >
-            <Text style={styles.submitText}>Save changes</Text>
-          </TouchableOpacity>
+          <ControlButton
+            isDirty={isDirty}
+            isSubmitting={isSubmitting}
+            onSubmit={handleSave}
+          />
 
-          <TouchableOpacity
-            style={StyleSheet.compose(styles.controlBtn, {
-              backgroundColor: isSubmitting
-                ? Styles[theme].PrimaryDisabled
-                : Styles[theme].NegativeUniversal,
-            })}
-            onPress={() => setIsConfirmDeleteModalOpen(true)}
-            disabled={isSubmitting}
-          >
-            <Text style={styles.submitText}>Delete activity</Text>
-          </TouchableOpacity>
+          <ControlButton
+            isDirty={isDirty}
+            isSubmitting={isSubmitting}
+            onSubmit={() => setIsConfirmDeleteModalOpen(true)}
+            mode="delete"
+          />
         </KeyboardAvoidingView>
 
         {isConfirmDeleteModalOpen && (

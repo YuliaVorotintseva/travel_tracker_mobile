@@ -14,7 +14,12 @@ import {
   TripWithMembers,
 } from "@/src/shared/types";
 import { Profiles } from "@/src/shared/types/api/generated";
-import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
+import {
+  ControlButton,
+  DatePickerModal,
+  IconBackButton,
+  SelectPicker,
+} from "@/src/shared/ui";
 import { Loader } from "@/src/shared/ui/loaders";
 import { getFormatDate, toLocalISODate } from "@/src/shared/utils";
 import { TripMembersListModal } from "@/src/widgets/trip_members_list";
@@ -59,6 +64,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
     mode: "onBlur",
   });
   const startDate = useWatch({ control, name: "start_date" });
+  const isHaveMembers = !!trip?.trip_members && trip.trip_members.length > 0;
 
   useEffect(() => {
     if (!profile) return;
@@ -255,27 +261,33 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
             />
           </View>
           <View>
-            <Pressable onPress={() => setIsMemberListOpen(true)}>
-              <Text>
-                {!!trip?.trip_members && trip.trip_members.length > 0
-                  ? `Trip members(${trip.trip_members.length})`
+            <Pressable
+              onPress={() => setIsMemberListOpen(true)}
+              disabled={!isHaveMembers}
+              style={[
+                styles.memberBtn,
+                {
+                  backgroundColor: isHaveMembers
+                    ? Styles[theme].PrimaryInitial
+                    : Styles[theme].PrimaryDisabled,
+                },
+              ]}
+            >
+              <Text style={styles.memberBtnText}>
+                {isHaveMembers
+                  ? `Trip members(${trip?.trip_members?.length})`
                   : "There is no any member yet"}
               </Text>
             </Pressable>
           </View>
+
           {!!error && <Text style={styles.error}>{`Problem: ${error}`}</Text>}
-          <Pressable onPress={onSubmit} style={styles.confirmBtn}>
-            <Text
-              style={{
-                color:
-                  isDirty && !isSubmitting
-                    ? Styles[theme].TextAccent
-                    : Styles[theme].TextDisabled,
-              }}
-            >
-              Save
-            </Text>
-          </Pressable>
+
+          <ControlButton
+            isDirty={isDirty}
+            isSubmitting={isSubmitting}
+            onSubmit={onSubmit}
+          />
         </View>
 
         {members && members.length > 0 && isMemberListOpen ? (

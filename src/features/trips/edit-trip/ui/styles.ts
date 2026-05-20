@@ -69,14 +69,16 @@ export const getStyles = (theme: Theme) =>
       fontSize: 16,
       width: "100%",
     },
-    confirmBtn: {
-      position: "absolute",
-      right: 0,
-      borderBottomWidth: 2,
+    memberBtn: {
+      borderRadius: 14,
+      padding: 16,
+      alignItems: "center",
+      marginTop: 8,
     },
-    confirmBtnText: {
+    memberBtnText: {
+      color: Styles[theme].TextOnColor,
       fontSize: 16,
-      fontWeight: "500",
+      fontWeight: "600",
     },
     error: {
       color: Styles[theme].TextNegative,
