@@ -1,1 +1,1 @@
-export * from "./RouteBuilder";
+export * from "./route-builder";
