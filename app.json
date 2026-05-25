@@ -49,7 +49,8 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "url": "https://sb_publishable_CCdm213x3QyvHeOt8culDA_NH6JyjS8.com"
     },
     "plugins": [
       "expo-router",

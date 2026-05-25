@@ -17,6 +17,7 @@ const App = () => {
         <Stack.Screen name="sign-up" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="trip" />
+        <Stack.Screen name="invite" />
 
         <Stack.Screen
           name="settings"
