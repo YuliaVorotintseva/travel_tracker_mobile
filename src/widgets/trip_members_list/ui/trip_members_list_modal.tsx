@@ -1,17 +1,22 @@
-import { FlashList } from "@shopify/flash-list";
 import { FC } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { CloseIcon } from "@/src/shared/icons";
 import { TripMemberWithProfile } from "@/src/shared/types";
 import { getFormatDateTime } from "@/src/shared/utils";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetStyles } from "./styles";
 
 type TripMembersListModalProps = {
   members: TripMemberWithProfile[];
   onClose: () => void;
-  onMember?: () => void;
+  onMember: () => void;
 };
 
 export const TripMembersListModal: FC<TripMembersListModalProps> = ({
@@ -24,43 +29,55 @@ export const TripMembersListModal: FC<TripMembersListModalProps> = ({
   return (
     <View style={styles.modalOverlay}>
       <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-      <SafeAreaView style={styles.modalContent}>
+      <View style={styles.modalContent}>
         <Pressable onPress={onClose}>
           <CloseIcon />
         </Pressable>
-        <View>
-          {!!members && (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {members.length > 0 ? (
             <View style={{ flex: 1 }}>
-              <FlashList
-                data={members}
-                renderItem={({ item }) => (
-                  <Pressable onPress={onMember} style={styles.member}>
+              <ScrollView contentContainerStyle={{ height: "100%" }}>
+                {members.map((item) => (
+                  <Pressable
+                    onPress={onMember}
+                    style={styles.member}
+                    key={item.user_id}
+                  >
                     <View style={styles.userInfo}>
-                      <Image
-                        style={styles.avatar}
-                        source={
-                          !!item.profiles?.avatar_url
-                            ? { uri: item.profiles.avatar_url }
-                            : require("../../../../assets/images/account24.png")
-                        }
-                      />
-                      <Text>
-                        {!!item.profiles && !!item.profiles?.full_name
-                          ? item.profiles.full_name
-                          : "unknown"}
-                      </Text>
-                      <Text>{getFormatDateTime(new Date(item.joined_at))}</Text>
+                      <View style={styles.header}>
+                        <Image
+                          style={styles.avatar}
+                          source={
+                            !!item.profiles?.avatar_url
+                              ? { uri: item.profiles.avatar_url }
+                              : require("../../../../assets/images/account24.png")
+                          }
+                          onError={(e) =>
+                            console.log("❌ Image error:", e.nativeEvent.error)
+                          }
+                        />
+                        <Text style={styles.name}>
+                          {!!item.profiles && !!item.profiles?.full_name
+                            ? item.profiles.full_name
+                            : "unknown"}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text
+                          style={styles.info}
+                        >{`Invited: ${getFormatDateTime(new Date(item.joined_at))}`}</Text>
+                        <Text style={styles.info}>{`Role: ${item.role}`}</Text>
+                      </View>
                     </View>
-                    <Text style={styles.role}>{item.role}</Text>
                   </Pressable>
-                )}
-                keyExtractor={(item) => item.user_id}
-                onEndReachedThreshold={0.5}
-              />
+                ))}
+              </ScrollView>
             </View>
+          ) : (
+            <Text>There is no any member yet</Text>
           )}
         </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 };

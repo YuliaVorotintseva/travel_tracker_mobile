@@ -19,8 +19,8 @@ export const useGetStyles = () => {
       zIndex: 999,
     },
     modalContent: {
-      width: "70%",
-      height: "50%",
+      width: "90%",
+      height: "70%",
       padding: 16,
       borderRadius: 16,
       shadowColor: "#000",
@@ -30,18 +30,35 @@ export const useGetStyles = () => {
       backgroundColor: Styles[theme].BgPrimary,
     },
     member: {
+      justifyContent: "space-between",
       backgroundColor: Styles[theme].BgSecondary,
-      marginBottom: 10,
+      borderRadius: 4,
+      padding: 16,
+      marginVertical: 10,
+      color: Styles[theme].TextPrimary,
     },
     userInfo: {
-      flexDirection: "row",
       justifyContent: "space-between",
+      gap: 10,
+    },
+    header: {
+      flexDirection: "row",
       alignItems: "center",
+      justifyContent: "flex-start",
     },
     avatar: {
       width: 32,
-      borderRadius: 8,
+      height: 32,
+      borderRadius: 20,
     },
-    role: {},
+    name: {
+      color: Styles[theme].TextPrimary,
+      marginLeft: 16,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    info: {
+      color: Styles[theme].TextPrimary,
+    },
   });
 };

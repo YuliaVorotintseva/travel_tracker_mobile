@@ -294,6 +294,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
           <TripMembersListModal
             members={members as TripMemberWithProfile[]}
             onClose={() => setIsMemberListOpen(false)}
+            onMember={() => {}}
           />
         ) : (
           isMemberListOpen && <Loader />
