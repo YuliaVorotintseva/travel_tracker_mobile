@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useMyProfile, useMyTrips, useTripMembers } from "@/src/shared/hooks";
 import { BackIcon } from "@/src/shared/icons";
-import { useTheme } from "@/src/shared/lib";
+import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import {
   CURRENCIES,
@@ -44,9 +44,13 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   const [isStartCalendarVisible, setIsStartCalendarVisible] = useState(false);
   const [isFinishCalendarVisible, setIsFinishCalendarVisible] = useState(false);
   const [isMemberListOpen, setIsMemberListOpen] = useState(false);
+  const [userRole, setUserRole] =
+    useState<TripMemberWithProfile["role"]>("viewer");
   const { profile } = useMyProfile();
   const { trips, updateTrip } = useMyTrips((profile as Profiles).id);
-  const { members } = useTripMembers(trip?.id ?? null);
+  const { members, updateMember, removeMember } = useTripMembers(
+    trip?.id ?? null,
+  );
   const {
     control,
     reset,
@@ -65,6 +69,18 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
   });
   const startDate = useWatch({ control, name: "start_date" });
   const isHaveMembers = !!trip?.trip_members && trip.trip_members.length > 0;
+
+  useEffect(() => {
+    (async () => {
+      supabase
+        .from("trip_members")
+        .select("role")
+        .eq("trip_id", tripId)
+        .eq("user_id", (profile as Profiles).id)
+        .single()
+        .then((data) => setUserRole(data.data?.role));
+    })();
+  }, []);
 
   useEffect(() => {
     if (!profile) return;
@@ -125,10 +141,16 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                     placeholder="Enter title of trip"
                     placeholderTextColor={Styles[theme].TextSecondary}
                     onBlur={onBlur}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(text)}
                     value={value}
                     autoCapitalize="none"
                     style={styles.input}
+                    editable={userRole !== "viewer"}
+                    onFocus={
+                      userRole === "viewer"
+                        ? (e) => e.target?.blur()
+                        : undefined
+                    }
                   />
                   {!!error && <Text style={styles.error}>{error.message}</Text>}
                 </View>
@@ -147,10 +169,16 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                     placeholder="Enter description of the trip"
                     placeholderTextColor={Styles[theme].TextSecondary}
                     onBlur={onBlur}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(text)}
                     value={value}
                     autoCapitalize="none"
                     style={styles.input}
+                    editable={userRole !== "viewer"}
+                    onFocus={
+                      userRole === "viewer"
+                        ? (e) => e.target?.blur()
+                        : undefined
+                    }
                   />
                   {!!error && <Text style={styles.error}>{error.message}</Text>}
                 </View>
@@ -169,10 +197,16 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                     placeholder="Enter your destination"
                     placeholderTextColor={Styles[theme].TextSecondary}
                     onBlur={onBlur}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(text)}
                     value={value}
                     autoCapitalize="none"
                     style={styles.input}
+                    editable={userRole !== "viewer"}
+                    onFocus={
+                      userRole === "viewer"
+                        ? (e) => e.target?.blur()
+                        : undefined
+                    }
                   />
                   {!!error && <Text style={styles.error}>{error.message}</Text>}
                 </View>
@@ -193,7 +227,10 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                     minDate={new Date()}
                   />
 
-                  <Pressable onPress={() => setIsStartCalendarVisible(true)}>
+                  <Pressable
+                    disabled={userRole === "viewer"}
+                    onPress={() => setIsStartCalendarVisible(true)}
+                  >
                     <Text style={styles.label}>Start day</Text>
                     <TextInput
                       placeholder="Enter start day"
@@ -214,6 +251,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
             <Controller
               name="end_date"
               control={control}
+              disabled={userRole === "viewer"}
               render={({ field: { onChange, value } }) => (
                 <View>
                   <DatePickerModal
@@ -226,7 +264,10 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                     minDate={startDate ? new Date(startDate) : new Date()}
                   />
 
-                  <Pressable onPress={() => setIsFinishCalendarVisible(true)}>
+                  <Pressable
+                    disabled={userRole === "viewer"}
+                    onPress={() => setIsFinishCalendarVisible(true)}
+                  >
                     <Text style={styles.label}>Finish day</Text>
                     <TextInput
                       placeholder="Enter start day"
@@ -255,6 +296,7 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
                     onChange={onChange}
                     options={CURRENCIES}
                     searchable={false}
+                    disabled={userRole === "viewer"}
                   />
                 </View>
               )}
@@ -293,8 +335,11 @@ export const EditTrip: FC<{ tripId: string }> = ({ tripId }) => {
         {members && members.length > 0 && isMemberListOpen ? (
           <TripMembersListModal
             members={members as TripMemberWithProfile[]}
+            userRole={userRole || "viewer"}
             onClose={() => setIsMemberListOpen(false)}
             onMember={() => {}}
+            onSelectRole={(userId, role) => updateMember({ userId, role })}
+            onDelete={(userId: string) => removeMember(userId)}
           />
         ) : (
           isMemberListOpen && <Loader />

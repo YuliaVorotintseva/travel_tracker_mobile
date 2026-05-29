@@ -126,7 +126,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
 
   const handleMapPress = (event: any) => {
     setSelectedCoord(event.nativeEvent.coordinate);
-    setisCreateActivityModalVisible(true);
+    userRole !== "viewer" && setisCreateActivityModalVisible(true);
   };
 
   const handleAddActivity = async (data: Partial<Activity>) => {
@@ -324,7 +324,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
         </Pressable>
       )}
 
-      {selectedActivity && (
+      {selectedActivity && ["owner", "editor"].includes(userRole || "") && (
         <EditActivityModal
           visible={isEditActivityModalVisible}
           onClose={() => {

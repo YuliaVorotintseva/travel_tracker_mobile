@@ -51,3 +51,8 @@ export const ACTIVITY_TYPES: SelectOption<Activity["type"]>[] = [
   { label: "☕ Отдых", value: "rest" },
   { label: "📌 Другое", value: "custom" },
 ];
+
+export const TRIP_MEMBER_ROLE: SelectOption<TripMemberWithProfile["role"]>[] = [
+  { label: "Viewer", value: "viewer" },
+  { label: "Editor", value: "editor" },
+];

@@ -60,5 +60,19 @@ export const useGetStyles = () => {
     info: {
       color: Styles[theme].TextPrimary,
     },
+    constrols: {
+      margin: 10,
+      gap: 10,
+    },
+    deleteBtn: {
+      backgroundColor: Styles[theme].NegativeUniversal,
+      borderRadius: 8,
+      padding: 10,
+      alignItems: "center",
+    },
+    deleteBtnText: {
+      color: Styles[theme].TextOnColor,
+      fontSize: 14,
+    },
   });
 };
