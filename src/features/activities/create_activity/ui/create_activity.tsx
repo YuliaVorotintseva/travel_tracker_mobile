@@ -38,7 +38,10 @@ export const CreateActivityModal = ({
   onSubmit,
   initialCoord,
 }: Props) => {
-  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+  const [isStartTimeCalendarVisible, setIsStartTimeCalendarVisible] =
+    useState(false);
+  const [isEndTimeCalendarVisible, setIsEndTimeCalendarVisible] =
+    useState(false);
   const { theme } = useTheme();
   const styles = useGetStyle(theme);
   const {
@@ -131,8 +134,8 @@ export const CreateActivityModal = ({
             render={({ field: { onChange, value } }) => (
               <View>
                 <DatePickerModal
-                  visible={isCalendarVisible}
-                  onClose={() => setIsCalendarVisible(false)}
+                  visible={isStartTimeCalendarVisible}
+                  onClose={() => setIsStartTimeCalendarVisible(false)}
                   onSelect={(date) => {
                     const localDate = toLocalDateTime(new Date(date));
                     onChange(localDate);
@@ -140,7 +143,7 @@ export const CreateActivityModal = ({
                   minDate={new Date()}
                 />
 
-                <Pressable onPress={() => setIsCalendarVisible(true)}>
+                <Pressable onPress={() => setIsStartTimeCalendarVisible(true)}>
                   <Text style={styles.label}>Start time</Text>
                   <TextInput
                     placeholder="Enter start time"
@@ -161,8 +164,8 @@ export const CreateActivityModal = ({
             render={({ field: { onChange, value } }) => (
               <View>
                 <DatePickerModal
-                  visible={isCalendarVisible}
-                  onClose={() => setIsCalendarVisible(false)}
+                  visible={isEndTimeCalendarVisible}
+                  onClose={() => setIsEndTimeCalendarVisible(false)}
                   onSelect={(date) => {
                     const localDate = toLocalDateTime(new Date(date));
                     onChange(localDate);
@@ -170,7 +173,7 @@ export const CreateActivityModal = ({
                   minDate={!!startDate ? new Date(startDate) : new Date()}
                 />
 
-                <Pressable onPress={() => setIsCalendarVisible(true)}>
+                <Pressable onPress={() => setIsEndTimeCalendarVisible(true)}>
                   <Text style={styles.label}>End time</Text>
                   <TextInput
                     placeholder="Enter end time"

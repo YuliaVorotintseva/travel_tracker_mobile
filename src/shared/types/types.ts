@@ -1,5 +1,5 @@
 import { SelectOption } from "../ui";
-import { Activities, Trips } from "./api/generated";
+import { Activities, ActivityComments, Trips } from "./api/generated";
 
 export type Theme = "light" | "dark";
 
@@ -34,6 +34,14 @@ export type Activity = Activities & {
     | "accommodation"
     | "custom";
   location: { lat: number; lng: number; address?: string } | null;
+};
+
+export type ActivityComment = ActivityComments & {
+  profiles: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
 };
 
 export const CURRENCIES: SelectOption<Currency>[] = [
