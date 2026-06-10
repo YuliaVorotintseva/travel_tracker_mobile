@@ -1,16 +1,17 @@
 import { FlashList } from "@shopify/flash-list";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { FC, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MyTripCard } from "@/src/entities/trips/my-trip-card/ui";
-import { useMyProfile, useMyTrips } from "@/src/shared/hooks";
+import { useMyProfile } from "@/src/shared/hooks";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { CreateButton } from "@/src/shared/ui";
 import { ConfirmDeleteModal } from "@/src/shared/ui/confirm_delete_modal";
 import { Loader } from "@/src/shared/ui/loaders";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMyTrips } from "../model";
 import { getStyles } from "./styles";
 
 export const MyTripsScreen: FC = () => {

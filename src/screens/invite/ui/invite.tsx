@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { FC, useEffect, useState } from "react";
 
-import { useJoinViaInvite } from "@/src/shared/hooks/use_join_via_invite";
+import { useJoinViaInvite } from "@/src/screens/invite/model";
 import { supabase } from "@/src/shared/lib";
 import { Loader } from "@/src/shared/ui/loaders";
 

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
 
-import { useActivityComments } from "@/src/shared/hooks";
 import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { ActivityComment } from "@/src/shared/types";
 import { Loader } from "@/src/shared/ui/loaders";
 import { getFormatDateTime } from "@/src/shared/utils";
+import { useActivityComments } from "../model";
 import { getStyles } from "./styles";
 
 interface ActivityCommentsSectionProps {

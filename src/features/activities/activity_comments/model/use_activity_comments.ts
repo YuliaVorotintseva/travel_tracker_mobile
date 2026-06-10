@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { supabase } from "@/src/shared/lib";
-import { ActivityComment } from "../types";
+import { ActivityComment } from "@/src/shared/types";
 
 export const useActivityComments = (
   activityId: string | null,

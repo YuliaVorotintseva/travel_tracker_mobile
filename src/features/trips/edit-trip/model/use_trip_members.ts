@@ -1,11 +1,34 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 import { supabase } from "@/src/shared/lib";
-import { TripMemberWithProfile } from "../types";
+import { TripMemberWithProfile } from "@/src/shared/types";
 
 export const useTripMembers = (tripId: string | null) => {
   const queryClient = useQueryClient();
   const queryKey = ["trip_members", tripId];
+
+  useEffect(() => {
+    if (!tripId) return;
+    const channel = supabase
+      .channel(`members-${tripId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "trip_members",
+          filter: `trip_id=eq.${tripId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey });
+        },
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [tripId, queryClient]);
 
   const {
     data: members = [],

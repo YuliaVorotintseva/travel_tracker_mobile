@@ -9,7 +9,7 @@ import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
 
-import { useTripActivities } from "@/src/shared/hooks";
+import { useTripActivities } from "../../model";
 import { useGetStyle } from "./styles";
 
 interface Props {

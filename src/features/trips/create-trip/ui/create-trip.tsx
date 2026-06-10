@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { FC, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import {
@@ -11,7 +12,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useMyProfile, useMyTrips } from "@/src/shared/hooks";
+import { useMyTrips } from "@/src/screens/trips";
+import { useMyProfile } from "@/src/shared/hooks";
 import { BackIcon } from "@/src/shared/icons";
 import { useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
@@ -19,7 +21,6 @@ import { CURRENCIES, Currency } from "@/src/shared/types";
 import { Profiles } from "@/src/shared/types/api/generated";
 import { DatePickerModal, IconBackButton, SelectPicker } from "@/src/shared/ui";
 import { getFormatDate, toLocalISODate } from "@/src/shared/utils";
-import { useRouter } from "expo-router";
 import { getStyles } from "./styles";
 
 type CreateTripData = {

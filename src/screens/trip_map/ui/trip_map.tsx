@@ -6,17 +6,14 @@ import MapView, { Marker, Polyline, Region } from "react-native-maps";
 
 import { CreateActivityModal } from "@/src/features/activities/create_activity";
 import { EditActivityModal } from "@/src/features/activities/edit_activity/ui/edit_activity";
-import {
-  useGetCurrentLocation,
-  useMyProfile,
-  useTripActivities,
-} from "@/src/shared/hooks";
+import { useGetCurrentLocation, useMyProfile } from "@/src/shared/hooks";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
 import { Activity, TripMember } from "@/src/shared/types";
 import { Profiles } from "@/src/shared/types/api/generated";
 import { Loader } from "@/src/shared/ui/loaders";
 import { ActivitiesListModal } from "@/src/widgets/activities_list/ui/activities_list_modal";
+import { useTripActivities } from "../model";
 import { Coordinate, fetchRoadRoute } from "../model/trip_map_actions";
 import { RouteBuilder } from "./route_builder";
 import { useGetStyle } from "./styles";

@@ -1,9 +1,11 @@
+import { useRouter } from "expo-router";
 import { FC, useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useMyProfile, useMyTrips, useTripMembers } from "@/src/shared/hooks";
+import { useMyTrips } from "@/src/screens/trips";
+import { useMyProfile } from "@/src/shared/hooks";
 import { BackIcon } from "@/src/shared/icons";
 import { supabase, useTheme } from "@/src/shared/lib";
 import { Styles } from "@/src/shared/styles";
@@ -23,7 +25,7 @@ import {
 import { Loader } from "@/src/shared/ui/loaders";
 import { getFormatDate, toLocalISODate } from "@/src/shared/utils";
 import { TripMembersListModal } from "@/src/widgets/trip_members_list";
-import { useRouter } from "expo-router";
+import { useTripMembers } from "../model";
 import { getStyles } from "./styles";
 
 export type EditTripFormData = {

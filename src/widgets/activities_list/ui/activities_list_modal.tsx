@@ -3,7 +3,7 @@ import { FC } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ActivityCommentsSection } from "@/src/features/activities/activity_comments/ui/activity_comment_section";
+import { ActivityCommentsSection } from "@/src/features/activities/activity_comments";
 import { useMyProfile } from "@/src/shared/hooks";
 import { CloseIcon } from "@/src/shared/icons";
 import { useTheme } from "@/src/shared/lib";

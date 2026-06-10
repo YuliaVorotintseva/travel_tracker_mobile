@@ -1,12 +1,35 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 import { supabase } from "@/src/shared/lib";
 import type { Activity } from "@/src/shared/types";
-import { addAddressesToActivities } from "../../screens/trip_map/model/trip_map_actions";
+import { addAddressesToActivities } from "./trip_map_actions";
 
 export const useTripActivities = (tripId: string | null) => {
   const queryClient = useQueryClient();
   const queryKey = ["activities", tripId];
+
+  useEffect(() => {
+    if (!tripId) return;
+    const channel = supabase
+      .channel(`activities-${tripId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "activities",
+          filter: `trip_id=eq.${tripId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey });
+        },
+      )
+      .subscribe();
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [tripId, queryClient]);
 
   const {
     data: activities = [],
