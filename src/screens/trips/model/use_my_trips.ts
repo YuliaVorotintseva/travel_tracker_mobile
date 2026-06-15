@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useOfflineMutation } from "@/src/shared/hooks";
 import { supabase } from "@/src/shared/lib";
 import { TripWithMembers } from "@/src/shared/types";
 
@@ -47,7 +48,16 @@ export const useMyTrips = (userId: string | null) => {
     refetchOnWindowFocus: false,
   });
 
-  const addMutation = useMutation({
+  const addMutation = useOfflineMutation({
+    table: "trips",
+    type: "create",
+    getPayload: (data) => {
+      if (!data) {
+        throw new Error("Missing trip data");
+      }
+      return { ...data };
+    },
+    getQueryKey: () => ["trips", userId!],
     retry: false,
     mutationFn: async (data: Omit<TripWithMembers, "id" | "trip_members">) => {
       const {
@@ -83,7 +93,16 @@ export const useMyTrips = (userId: string | null) => {
     onSettled: () => queryClient.invalidateQueries({ queryKey }),
   });
 
-  const updateMutation = useMutation({
+  const updateMutation = useOfflineMutation({
+    table: "trips",
+    type: "update",
+    getPayload: ({ id, data }) => {
+      if (!id || !data) {
+        throw new Error("Missing trip id or data");
+      }
+      return { id, ...data };
+    },
+    getQueryKey: () => ["trips", userId!],
     retry: false,
     mutationFn: async ({
       id,
@@ -122,7 +141,16 @@ export const useMyTrips = (userId: string | null) => {
     onSettled: () => queryClient.invalidateQueries({ queryKey }),
   });
 
-  const removeMutation = useMutation({
+  const removeMutation = useOfflineMutation({
+    table: "trips",
+    type: "delete",
+    getPayload: (id) => {
+      if (!id) {
+        throw new Error("Missing trip id");
+      }
+      return { id };
+    },
+    getQueryKey: () => ["trips", userId!],
     retry: false,
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("trips").delete().eq("id", id);

@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/src/shared/lib";
 import { Profiles } from "@/src/shared/types/api/generated";
+import { useOfflineMutation } from "./use_offline_mutation";
 
 export const useMyProfile = () => {
   const queryClient = useQueryClient();
@@ -39,7 +40,16 @@ export const useMyProfile = () => {
     mutateAsync: updateProfile,
     isPending: isUpdating,
     error: updateError,
-  } = useMutation({
+  } = useOfflineMutation({
+    table: "profiles",
+    type: "update",
+    getPayload: (updatedData) => {
+      if (!updatedData) {
+        throw new Error("Missing updated data");
+      }
+      return { ...updatedData };
+    },
+    getQueryKey: () => ["profiles"],
     mutationFn: async (updatedData: Partial<Profiles>) => {
       const {
         data: { session },

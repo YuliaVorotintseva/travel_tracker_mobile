@@ -1,6 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+import { useOfflineMutation } from "@/src/shared/hooks";
 import { supabase } from "@/src/shared/lib";
 import { TripMemberWithProfile } from "@/src/shared/types";
 
@@ -10,8 +11,11 @@ export const useTripMembers = (tripId: string | null) => {
 
   useEffect(() => {
     if (!tripId) return;
-    const channel = supabase
-      .channel(`members-${tripId}`)
+
+    const channel = supabase.channel(
+      `members-${tripId}-${Math.random().toString(36).substring(2, 9)}`,
+    );
+    channel
       .on(
         "postgres_changes",
         {
@@ -25,8 +29,10 @@ export const useTripMembers = (tripId: string | null) => {
         },
       )
       .subscribe();
+
     return () => {
       channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [tripId, queryClient]);
 
@@ -55,7 +61,20 @@ export const useTripMembers = (tripId: string | null) => {
     refetchOnWindowFocus: false,
   });
 
-  const addMutation = useMutation({
+  const addMutation = useOfflineMutation({
+    table: "trip_members",
+    type: "create",
+    getPayload: ({ user_id, role }) => {
+      if (!tripId) {
+        throw new Error("Missing tripId");
+      }
+      return {
+        trip_id: tripId,
+        user_id: user_id,
+        role,
+      };
+    },
+    getQueryKey: () => ["trip_members", tripId!],
     retry: false,
     mutationFn: async ({
       user_id,
@@ -96,7 +115,20 @@ export const useTripMembers = (tripId: string | null) => {
     onSettled: () => queryClient.invalidateQueries({ queryKey }),
   });
 
-  const updateMutation = useMutation({
+  const updateMutation = useOfflineMutation({
+    table: "trip_members",
+    type: "update",
+    getPayload: ({ userId, role }) => {
+      if (!tripId) {
+        throw new Error("Missing tripId");
+      }
+      return {
+        trip_id: tripId,
+        user_id: userId,
+        role,
+      };
+    },
+    getQueryKey: () => ["trip_members", tripId!],
     retry: false,
     mutationFn: async ({
       userId,
@@ -134,7 +166,19 @@ export const useTripMembers = (tripId: string | null) => {
     onSettled: () => queryClient.invalidateQueries({ queryKey }),
   });
 
-  const removeMutation = useMutation({
+  const removeMutation = useOfflineMutation({
+    table: "trip_members",
+    type: "delete",
+    getPayload: (user_id) => {
+      if (!tripId) {
+        throw new Error("Missing tripId");
+      }
+      return {
+        trip_id: tripId,
+        user_id: user_id,
+      };
+    },
+    getQueryKey: () => ["trip_members", tripId!],
     retry: false,
     mutationFn: async (userId: string) => {
       const { error } = await supabase

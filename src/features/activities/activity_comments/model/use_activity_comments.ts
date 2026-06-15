@@ -1,6 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+import { useOfflineMutation } from "@/src/shared/hooks";
 import { supabase } from "@/src/shared/lib";
 import { ActivityComment } from "@/src/shared/types";
 
@@ -13,8 +14,10 @@ export const useActivityComments = (
 
   useEffect(() => {
     if (!activityId) return;
-    const channel = supabase
-      .channel(`comments-${activityId}`)
+    const channel = supabase.channel(
+      `comments-${activityId}-${Math.random().toString(36).substring(2, 9)}`,
+    );
+    channel
       .on(
         "postgres_changes",
         {
@@ -28,8 +31,10 @@ export const useActivityComments = (
         },
       )
       .subscribe();
+
     return () => {
       channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [activityId, queryClient]);
 
@@ -41,22 +46,36 @@ export const useActivityComments = (
         .select("*, profiles(id, full_name, avatar_url)")
         .eq("activity_id", activityId!)
         .order("created_at", { ascending: true });
-      if (error) throw error;
+      if (!!error) throw error;
       return data || [];
     },
     enabled: !!activityId,
     staleTime: 1000 * 60 * 2,
   });
 
-  const addMutation = useMutation({
+  const addMutation = useOfflineMutation({
+    table: "activity_comments",
+    type: "create",
+    getPayload: (content: string) => {
+      return {
+        activity_id: activityId,
+        user_id: currentUserId,
+        content,
+      };
+    },
+    getQueryKey: () => ["activity_comments", activityId!],
+    retry: false,
     mutationFn: async (content: string) => {
-      if (!currentUserId) throw new Error("Not authenticated");
+      if (!currentUserId) {
+        throw new Error("Not authenticated");
+      }
+
       const { data, error } = await supabase
         .from("activity_comments")
         .insert({ activity_id: activityId!, user_id: currentUserId, content })
         .select("*, profiles(id, full_name, avatar_url)")
         .single();
-      if (error) throw error;
+      if (!!error) throw error;
       return data;
     },
     onMutate: async (content) => {
@@ -69,7 +88,7 @@ export const useActivityComments = (
         user_id: currentUserId!,
         content,
         created_at: new Date().toISOString(),
-        profiles: null, // Подгрузится после invalidate
+        profiles: null,
       };
       queryClient.setQueryData(queryKey, [...previous, temp]);
       return { previous };
@@ -80,13 +99,23 @@ export const useActivityComments = (
     onSettled: () => queryClient.invalidateQueries({ queryKey }),
   });
 
-  const deleteMutation = useMutation({
+  const deleteMutation = useOfflineMutation({
+    table: "activity_comments",
+    type: "delete",
+    getPayload: (commentId: string) => {
+      if (!commentId) {
+        throw new Error("Missing commentId");
+      }
+      return { id: commentId };
+    },
+    getQueryKey: () => ["activity_comments", activityId!],
+    retry: false,
     mutationFn: async (commentId: string) => {
       const { error } = await supabase
         .from("activity_comments")
         .delete()
         .eq("id", commentId);
-      if (error) throw error;
+      if (!!error) throw error;
     },
     onMutate: async (commentId) => {
       await queryClient.cancelQueries({ queryKey });
