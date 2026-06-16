@@ -1,0 +1,222 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+
+import { useOfflineMutation } from "@/src/shared/hooks";
+import { supabase } from "@/src/shared/lib";
+import { TripMemberWithProfile } from "@/src/shared/types";
+
+export const useTripMembers = (tripId: string | null) => {
+  const queryClient = useQueryClient();
+  const queryKey = ["trip_members", tripId];
+
+  useEffect(() => {
+    if (!tripId) return;
+
+    const channel = supabase.channel(
+      `members-${tripId}-${Math.random().toString(36).substring(2, 9)}`,
+    );
+    channel
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "trip_members",
+          filter: `trip_id=eq.${tripId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey });
+        },
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+      supabase.removeChannel(channel);
+    };
+  }, [tripId, queryClient]);
+
+  const {
+    data: members = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trip_members")
+        .select("*, profiles(id, full_name, avatar_url)")
+        .eq("trip_id", tripId!);
+
+      if (error?.code || error?.message) {
+        console.error(error);
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!tripId,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
+
+  const addMutation = useOfflineMutation({
+    table: "trip_members",
+    type: "create",
+    getPayload: ({ user_id, role }) => {
+      if (!tripId) {
+        throw new Error("Missing tripId");
+      }
+      return {
+        trip_id: tripId,
+        user_id: user_id,
+        role,
+      };
+    },
+    getQueryKey: () => ["trip_members", tripId!],
+    retry: false,
+    mutationFn: async ({
+      user_id,
+      role,
+    }: {
+      user_id: string;
+      role: TripMemberWithProfile["role"];
+    }) => {
+      const { data: newMember, error } = await supabase
+        .from("trip_members")
+        .insert({ trip_id: tripId, user_id, role })
+        .select("*, profiles(id, full_name, avatar_url)")
+        .single();
+
+      if (error?.code || error?.message) {
+        console.error(error);
+        throw error;
+      }
+
+      return newMember;
+    },
+    onMutate: async ({ user_id, role }) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous =
+        queryClient.getQueryData<TripMemberWithProfile[]>(queryKey) || [];
+      const temp: TripMemberWithProfile = {
+        user_id,
+        role,
+        joined_at: new Date().toISOString(),
+        profiles: null,
+      };
+      queryClient.setQueryData(queryKey, [...previous, temp]);
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(queryKey, ctx.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
+  const updateMutation = useOfflineMutation({
+    table: "trip_members",
+    type: "update",
+    getPayload: ({ userId, role }) => {
+      if (!tripId) {
+        throw new Error("Missing tripId");
+      }
+      return {
+        trip_id: tripId,
+        user_id: userId,
+        role,
+      };
+    },
+    getQueryKey: () => ["trip_members", tripId!],
+    retry: false,
+    mutationFn: async ({
+      userId,
+      role,
+    }: {
+      userId: string;
+      role: TripMemberWithProfile["role"];
+    }) => {
+      const { data: updatedMember, error } = await supabase
+        .from("trip_members")
+        .update({ role })
+        .eq("user_id", userId)
+        .select()
+        .single();
+
+      if (error?.code || error?.message) {
+        console.error(error);
+        throw error;
+      }
+
+      return updatedMember;
+    },
+    onMutate: async ({ userId, role }) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous =
+        queryClient.getQueryData<TripMemberWithProfile[]>(queryKey);
+      queryClient.setQueryData(queryKey, (prev: TripMemberWithProfile[]) =>
+        prev?.map((u) => (u.user_id === userId ? { ...u, role } : u)),
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(queryKey, ctx.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
+  const removeMutation = useOfflineMutation({
+    table: "trip_members",
+    type: "delete",
+    getPayload: (user_id) => {
+      if (!tripId) {
+        throw new Error("Missing tripId");
+      }
+      return {
+        trip_id: tripId,
+        user_id: user_id,
+      };
+    },
+    getQueryKey: () => ["trip_members", tripId!],
+    retry: false,
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase
+        .from("trip_members")
+        .delete()
+        .eq("user_id", userId)
+        .eq("trip_id", tripId!);
+
+      if (error?.code || error?.message) {
+        console.error(error);
+        throw error;
+      }
+    },
+    onMutate: async (userId) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous =
+        queryClient.getQueryData<TripMemberWithProfile[]>(queryKey);
+      queryClient.setQueryData(queryKey, (prev: TripMemberWithProfile[]) =>
+        prev?.filter((u) => u.user_id !== userId),
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(queryKey, ctx.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey }),
+  });
+
+  return {
+    members,
+    isLoading,
+    error,
+    refetch,
+    addMember: addMutation.mutateAsync,
+    updateMember: updateMutation.mutateAsync,
+    removeMember: removeMutation.mutateAsync,
+    isAdding: addMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isRemoving: removeMutation.isPending,
+  };
+};

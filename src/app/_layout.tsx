@@ -1,27 +1,79 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import "react-native-reanimated";
 
-import { useColorScheme } from "@/src/shared/hooks/use-color-scheme";
+import {
+  useTheme,
+  AuthProvider,
+  OfflineProvider,
+  ThemeProvider,
+} from "@/src/shared/lib";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-export const unstable_settings = {
-  anchor: "(tabs)",
+const App = () => {
+  const { theme } = useTheme();
+
+  return (
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="sign-up" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="trip" />
+        <Stack.Screen name="invite" />
+
+        <Stack.Screen
+          name="settings"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+          }}
+        />
+        <Stack.Screen
+          name="create-trip"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+          }}
+        />
+        <Stack.Screen
+          name="edit-trip"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+          }}
+        />
+        <Stack.Screen
+          name="/users/my_profile"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+          }}
+        />
+      </Stack>
+      <StatusBar
+        style={theme === "light" ? "light" : "dark"}
+        backgroundColor="transparent"
+        translucent={true}
+      />
+    </>
+  );
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const queryClient = new QueryClient();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <OfflineProvider>
+          <AuthProvider>
+            <ThemeProvider>
+              <App />
+            </ThemeProvider>
+          </AuthProvider>
+        </OfflineProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

@@ -1,3 +1,3 @@
-export default function HomeScreen() {
-  return <></>;
-}
+import { MapScreen } from "@/src/screens/map";
+
+export default MapScreen;

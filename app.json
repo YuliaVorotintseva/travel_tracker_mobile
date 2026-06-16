@@ -1,16 +1,28 @@
 {
   "expo": {
-    "name": "travel_tracker_mobile",
-    "slug": "travel_tracker_mobile",
+    "name": "travelTrackerMobile",
+    "slug": "travelTrackerMobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "traveltrackermobile",
+    "scheme": "traveltracker",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.travel-tracker-mobile"
+      "bundleIdentifier": "com.yuliavorotintseva.travelTrackerMobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Приложению нужен доступ к вашему местоположению для отображения на карте",
+        "NSLocationAlwaysUsageDescription": "Приложению нужен доступ к вашему местоположению для отображения на карте",
+        "NSCameraUsageDescription": "Приложению нужен доступ к камере для загрузки аватара.",
+        "NSPhotoLibraryUsageDescription": "Приложению нужен доступ к галерее для загрузки аватара."
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyD7LizMzoxM264nyGGXSxcVPoQ-XpocnKg"
+        }
+      },
+      "appleTeamId": "9TRN25LLSZ"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,13 +31,26 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAQGw0EvRRKKOWEnPdTy4faNMDYH0nAMbo"
+        }
+      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.travel_tracker_mobile"
+      "package": "com.yuliavorotintseva.travelTrackerMobile"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "url": "https://sb_publishable_CCdm213x3QyvHeOt8culDA_NH6JyjS8.com"
     },
     "plugins": [
       "expo-router",
@@ -38,6 +63,17 @@
           "backgroundColor": "#ffffff",
           "dark": {
             "backgroundColor": "#000000"
+          }
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          },
+          "android": {
+            "extraMavenRepos": ["https://jitpack.io"]
           }
         }
       ]
