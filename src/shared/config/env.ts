@@ -15,18 +15,10 @@ type EnvShape = {
 };
 
 export const ENV: EnvShape = {
-  SUPABASE_URL: supabaseUrl || "https://wtvoqcpxqsgmqfimwpbl.supabase.co",
-  SUPABASE_ANON:
-    supabaseAnon ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dm9xY3B4cXNnbXFmaW13cGJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MjUxODcsImV4cCI6MjA5MzEwMTE4N30.3JLEVv3qWbOli3dm6iwb2LMMA36A4zVPXxwyfSymW_o",
-  WEB_CLIENT_ID:
-    webClientId ||
-    "166459366038-fbetjvo5rpv7gf255kpi1rmp1g28klkq.apps.googleusercontent.com",
-  ANDROID_CLIENT_ID:
-    androidClientId ||
-    "166459366038-67kvgp40ru1r3d60hf2hhh2uupvo2bpl.apps.googleusercontent.com",
-  IOS_CLIENT_ID:
-    iosClientId ||
-    "166459366038-mqigb285j43lvm4c4v42ktiptj50702m.apps.googleusercontent.com",
-  GOOGLE_MAPS_KEY: googleMapsKey || "AIzaSyBCxb8FLp-JMTGgUkYtfsoFlrO1QJwySX0",
+  SUPABASE_URL: supabaseUrl || "",
+  SUPABASE_ANON: supabaseAnon || "",
+  WEB_CLIENT_ID: webClientId || "",
+  ANDROID_CLIENT_ID: androidClientId || "",
+  IOS_CLIENT_ID: iosClientId || "",
+  GOOGLE_MAPS_KEY: googleMapsKey || "",
 };
