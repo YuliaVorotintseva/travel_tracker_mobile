@@ -84,14 +84,14 @@ export const AvatarPicker = ({
           />
 
           <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>Выберите источник</Text>
+            <Text style={styles.sheetTitle}>Select source</Text>
 
             <TouchableOpacity
               style={styles.option}
               onPress={() => handleSourceSelect("camera")}
             >
               <Text style={styles.optionIcon}>📷</Text>
-              <Text style={styles.optionText}>Сделать фото</Text>
+              <Text style={styles.optionText}>Create photo</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -99,7 +99,7 @@ export const AvatarPicker = ({
               onPress={() => handleSourceSelect("gallery")}
             >
               <Text style={styles.optionIcon}>🖼️</Text>
-              <Text style={styles.optionText}>Выбрать из галереи</Text>
+              <Text style={styles.optionText}>Select from gallery</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -107,7 +107,7 @@ export const AvatarPicker = ({
               onPress={handleFallbackUpload}
             >
               <Text style={styles.optionText}>
-                ⚡ Быстрый выбор (камера → галерея)
+                ⚡ Quick selection (camera → gallery)
               </Text>
             </TouchableOpacity>
 
@@ -115,7 +115,7 @@ export const AvatarPicker = ({
               style={styles.cancelBtn}
               onPress={() => setModalVisible(false)}
             >
-              <Text style={styles.cancelText}>Отмена</Text>
+              <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -46,7 +46,7 @@ export const MyTripsScreen: FC = () => {
     });
 
     channel.subscribe((status) => {
-      if (status === "SUBSCRIBED") console.log("✅ Realtime подключён");
+      if (status === "SUBSCRIBED") console.log("✅ Realtime connected");
     });
 
     return () => {

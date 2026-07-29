@@ -20,7 +20,7 @@ export const useGetCurrentLocation = () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         throw new Error(
-          "Разрешение на геолокацию не предоставлено. Включите в настройках.",
+          "Geolocation permission is not granted. Please enable it in settings",
         );
       }
 

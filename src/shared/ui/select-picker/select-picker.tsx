@@ -31,7 +31,7 @@ export const SelectPicker = <T extends string | number>({
   options,
   value,
   onChange,
-  placeholder = "Выберите из списка",
+  placeholder = "Select from the list",
   searchable = false,
   title,
   disabled = false,
@@ -68,7 +68,7 @@ export const SelectPicker = <T extends string | number>({
         onPress={() => !disabled && setModalVisible(true)}
         activeOpacity={0.7}
         accessibilityRole="button"
-        accessibilityLabel={`Выбрать ${title || "значение"}`}
+        accessibilityLabel={`Choose ${title || "value"}`}
       >
         <Text
           style={[styles.triggerText, !selectedOption && styles.placeholder]}
@@ -97,7 +97,7 @@ export const SelectPicker = <T extends string | number>({
             {searchable && (
               <TextInput
                 style={styles.searchInput}
-                placeholder="🔍 Поиск..."
+                placeholder="🔍 Searching..."
                 value={search}
                 onChangeText={setSearch}
                 autoFocus
@@ -139,7 +139,7 @@ export const SelectPicker = <T extends string | number>({
                 );
               }}
               ListEmptyComponent={
-                <Text style={styles.emptyText}>Ничего не найдено</Text>
+                <Text style={styles.emptyText}>Nothing found</Text>
               }
               style={styles.list}
               showsVerticalScrollIndicator={false}

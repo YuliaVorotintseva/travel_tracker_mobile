@@ -81,7 +81,7 @@ export const CreateActivityModal = ({
         />
 
         <View style={styles.sheet}>
-          <Text style={styles.title}>Добавить точку</Text>
+          <Text style={styles.title}>Add new activity</Text>
           {initialCoord && (
             <Text style={styles.coordText}>
               📍 {initialCoord.latitude.toFixed(4)},{" "}

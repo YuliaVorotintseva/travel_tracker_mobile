@@ -91,7 +91,6 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
               maximumDate: maxDate,
               onChange: (timeEvent, timeSelected) => {
                 if (timeEvent.type === "set" && timeSelected) {
-                  // 🎯 Собираем финальную дату: дата из первого шага + время из второго
                   const finalDate = new Date(
                     androidDatetimeRef.current.date!.getFullYear(),
                     androidDatetimeRef.current.date!.getMonth(),
@@ -102,7 +101,6 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
                   );
                   onSelect(finalDate);
                 }
-                // В любом случае закрываем
                 setShowPicker(false);
                 handleClose();
               },
@@ -144,11 +142,11 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
           <View style={styles.sheet}>
             <View style={styles.header}>
               <TouchableOpacity onPress={handleClose} style={styles.btn}>
-                <Text style={styles.cancelText}>Отмена</Text>
+                <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
-              <Text style={styles.title}>Выберите дату</Text>
+              <Text style={styles.title}>Choose date</Text>
               <TouchableOpacity onPress={handleConfirm} style={styles.btn}>
-                <Text style={styles.confirmText}>Готово</Text>
+                <Text style={styles.confirmText}>Ready</Text>
               </TouchableOpacity>
             </View>
             <DateTimePicker

@@ -233,9 +233,9 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
       {showEmptyState && (
         <View style={styles.emptyState}>
           <MaterialIcons name="map" size={48} color="#94A3B8" />
-          <Text style={styles.emptyTitle}>Маршрут пуст</Text>
+          <Text style={styles.emptyTitle}>Route is empty</Text>
           <Text style={styles.emptyText}>
-            Нажмите на любое место карты, чтобы добавить первую точку
+            Click anywhere on the map to add your first activity
           </Text>
         </View>
       )}
@@ -257,7 +257,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
           onPress={() => setShowRouteBuilder(true)}
         >
           <MaterialIcons name="route" size={20} color="#fff" />
-          <Text style={styles.btnText}>Построить маршрут</Text>
+          <Text style={styles.btnText}>Create route</Text>
         </Pressable>
       </View>
 
@@ -274,9 +274,7 @@ export const TripMapScreen: FC<{ tripId: string }> = ({ tripId }) => {
               onPress={() => setShowRoute((p) => !p)}
             >
               <MaterialIcons size={20} color="#fff" />
-              <Text style={styles.btnText}>
-                {showRoute ? "Скрыть" : "Маршрут"}
-              </Text>
+              <Text style={styles.btnText}>{showRoute ? "Hide" : "Route"}</Text>
             </TouchableOpacity>
             {routePoints.length > 1 && (
               <TouchableOpacity

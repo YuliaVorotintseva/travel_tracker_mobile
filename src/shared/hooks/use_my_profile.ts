@@ -54,7 +54,7 @@ export const useMyProfile = () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session?.user) throw new Error("Пользователь не авторизован");
+      if (!session?.user) throw new Error("User is not authorized");
 
       const { data, error } = await supabase
         .from("profiles")

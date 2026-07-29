@@ -6,7 +6,7 @@ const API_KEY = "sb_secret_hkpOkiMenGuJE5E3DlYehA_L5tDbk1f";
 
 async function ensureOpenApiSpec() {
   if (existsSync(FILE_PATH)) {
-    console.log("✅ openapi.json уже существует.");
+    console.log("openapi.json already exist.");
     return;
   }
 
@@ -14,7 +14,7 @@ async function ensureOpenApiSpec() {
     mkdirSync("./src/shared/types/api", { recursive: true });
   }
 
-  console.log("📥 openapi.json не найден. Скачиваю...");
+  console.log("openapi.json not found. Downloading...");
   try {
     const res = await fetch(API_URL, {
       headers: {
@@ -26,13 +26,12 @@ async function ensureOpenApiSpec() {
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
 
     const spec = await res.json();
-    if (!spec.openapi && !spec.paths)
-      throw new Error("Получен некорректный OpenAPI spec");
+    if (!spec.openapi && !spec.paths) throw new Error("Incorrect OpenAPI spec");
 
     writeFileSync(FILE_PATH, JSON.stringify(spec, null, 2), "utf-8");
-    console.log("✅ Успешно сохранён.");
+    console.log("Success saving!");
   } catch (error) {
-    console.error("❌ Ошибка загрузки:", error);
+    console.error("Downloading error:", error);
   }
 }
 

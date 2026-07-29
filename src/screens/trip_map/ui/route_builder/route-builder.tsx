@@ -34,12 +34,12 @@ export const RouteBuilder = ({ tripId, userRole, onClose }: Props) => {
   if (!["owner", "editor"].includes(userRole || "")) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>📍 Построение маршрута</Text>
+        <Text style={styles.title}>📍 Route creating</Text>
         <Text style={styles.error}>
-          Только создатель или редактор может менять маршрут путешествия
+          Only the creator or editor can change the travel route.
         </Text>
         <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-          <Text style={styles.btnText}>Закрыть</Text>
+          <Text style={styles.btnText}>Close</Text>
         </TouchableOpacity>
       </View>
     );
@@ -84,11 +84,11 @@ export const RouteBuilder = ({ tripId, userRole, onClose }: Props) => {
         >
           <MaterialIcons name="drag-indicator" size={20} color="#94A3B8" />
           <View style={{ flex: 1, marginLeft: 8 }}>
-            <Text style={styles.itemTitle}>{item.title || "Без названия"}</Text>
+            <Text style={styles.itemTitle}>{item.title || "Untitled"}</Text>
             <Text style={styles.itemMeta}>
               {item.type} •{" "}
               {item.start_time
-                ? new Date(item.start_time).toLocaleTimeString("ru-RU", {
+                ? new Date(item.start_time).toLocaleTimeString("en-EN", {
                     hour: "2-digit",
                     minute: "2-digit",
                   })
@@ -103,8 +103,10 @@ export const RouteBuilder = ({ tripId, userRole, onClose }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🗺️ Порядок маршрута</Text>
-      <Text style={styles.subtitle}>Перетащи точки в нужном порядке</Text>
+      <Text style={styles.title}>🗺️ Route order</Text>
+      <Text style={styles.subtitle}>
+        Drag the activities into the desired order
+      </Text>
 
       <View style={{ flex: 1, marginVertical: 12 }}>
         <DraggableFlatList
@@ -113,7 +115,9 @@ export const RouteBuilder = ({ tripId, userRole, onClose }: Props) => {
           renderItem={renderItem}
           onDragEnd={onDragEnd}
           ListEmptyComponent={
-            <Text style={styles.empty}>Нет точек для маршрута</Text>
+            <Text style={styles.empty}>
+              There are no activities for the route
+            </Text>
           }
         />
       </View>
@@ -124,16 +128,14 @@ export const RouteBuilder = ({ tripId, userRole, onClose }: Props) => {
           onPress={onClose}
           disabled={saving}
         >
-          <Text style={styles.cancelText}>Отмена</Text>
+          <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.saveBtn, saving && styles.saveBtnDisabled]}
           onPress={handleSave}
           disabled={saving}
         >
-          <Text style={styles.btnText}>
-            {saving ? "Сохранение..." : "Сохранить маршрут"}
-          </Text>
+          <Text style={styles.btnText}>{saving ? "Saving..." : "Save"}</Text>
         </TouchableOpacity>
       </View>
     </View>

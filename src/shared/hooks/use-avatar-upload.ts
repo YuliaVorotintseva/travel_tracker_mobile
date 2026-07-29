@@ -11,7 +11,7 @@ export const useAvatarUpload = (userId: string) => {
   const processImage = useCallback(
     async (asset: ImagePicker.ImagePickerAsset): Promise<string | null> => {
       if (asset.fileSize && asset.fileSize > 5 * 1024 * 1024) {
-        throw new Error("Файл не должен превышать 5МБ");
+        throw new Error("The file must not exceed 5MB");
       }
 
       const fileExt = asset.uri.split(".").pop()?.toLowerCase() || "jpg";
@@ -59,7 +59,8 @@ export const useAvatarUpload = (userId: string) => {
 
   const pickFromGallery = useCallback(async (): Promise<string | null> => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") throw new Error("Доступ к галерее запрещён");
+    if (status !== "granted")
+      throw new Error("Access to the gallery is denied");
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -68,22 +69,22 @@ export const useAvatarUpload = (userId: string) => {
       quality: 0.8,
     });
 
-    if (result.canceled) throw new Error("Выбор отменён");
+    if (result.canceled) throw new Error("Selection cancelled");
     return await processImage(result.assets[0]);
   }, [processImage]);
 
   const takeFromCamera = useCallback(async (): Promise<string | null> => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") throw new Error("Доступ к камере запрещён");
+    if (status !== "granted") throw new Error("Access to the camera is denied");
 
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
-      cameraType: ImagePicker.CameraType.front, // или 'back'
+      cameraType: ImagePicker.CameraType.front,
     });
 
-    if (result.canceled) throw new Error("Съёмка отменена");
+    if (result.canceled) throw new Error("Filming has been cancelled");
     return await processImage(result.assets[0]);
   }, [processImage]);
 
@@ -104,15 +105,15 @@ export const useAvatarUpload = (userId: string) => {
           return await takeFromCamera();
         } catch (cameraError: any) {
           if (
-            cameraError.message.includes("отмен") ||
-            cameraError.message.includes("запрещён")
+            cameraError.message.includes("cancel") ||
+            cameraError.message.includes("denied")
           ) {
             return await pickFromGallery();
           }
           throw cameraError;
         }
       } catch (err: any) {
-        setError(err.message || "Ошибка загрузки");
+        setError(err.message || "Loading error");
         return null;
       } finally {
         setIsUploading(false);

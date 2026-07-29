@@ -83,7 +83,7 @@ export const EditActivityModal = ({
         />
 
         <KeyboardAvoidingView style={styles.sheet}>
-          <Text style={styles.title}>Редактирование активности</Text>
+          <Text style={styles.title}>Edit activity</Text>
           <Text style={styles.coordText}>
             {`📍 ${activity.location.lat.toFixed(4)}, ${activity.location.lng.toFixed(4)}`}
           </Text>
